@@ -1,0 +1,17 @@
+rules_version = '2';
+
+// Reglas de Cloud Storage: fotos de mascotas.
+// Desplegar con: firebase deploy --only storage
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /pets/{userId}/{fileName} {
+      // Las fotos son públicas (aparecen en alertas comunitarias),
+      // pero solo el dueño puede subirlas, con límite de 2 MB e imagen.
+      allow read: if true;
+      allow write: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.size < 2 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+  }
+}

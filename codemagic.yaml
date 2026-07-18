@@ -1,0 +1,111 @@
+# ─── Codemagic CI: compila y publica iOS y Android sin infraestructura ──────
+# Documentación: https://docs.codemagic.io/yaml-basic-configuration/
+#
+# Configuración previa en codemagic.io (una sola vez):
+#
+# iOS (ver APPSTORE.md paso 4):
+#  1. Conecta el repositorio Git.
+#  2. Teams → Integrations → App Store Connect: sube una API key de
+#     App Store Connect y nómbrala exactamente "patrulla-asc".
+#  3. En la app de Codemagic → Environment variables, crea la variable segura
+#     GOOGLE_SERVICE_INFO_PLIST (grupo "firebase") con el contenido del
+#     GoogleService-Info.plist real codificado en base64.
+#  4. Reemplaza APP_STORE_APPLE_ID abajo con el Apple ID numérico de tu app
+#     (aparece en App Store Connect → App Information).
+#
+# Android (ver PLAYSTORE.md paso 4):
+#  1. Teams → Code signing identities → Android keystores: genera (o sube) un
+#     keystore y nómbralo exactamente "patrulla_keystore".
+#  2. Variable segura GOOGLE_SERVICES_JSON (grupo "firebase") con el
+#     google-services.json real codificado en base64.
+#  3. Variable segura GCLOUD_SERVICE_ACCOUNT_CREDENTIALS (grupo "google_play")
+#     con el JSON de la cuenta de servicio de Play Console (para publicar).
+
+workflows:
+  ios-appstore:
+    name: iOS · Build y subida a TestFlight
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    integrations:
+      app_store_connect: patrulla-asc
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.patrullapatitas.app
+      groups:
+        - firebase
+      vars:
+        XCODE_PROJECT: ios/App/App.xcodeproj
+        XCODE_SCHEME: App
+        APP_STORE_APPLE_ID: 1234567890 # ← reemplazar con el Apple ID numérico de la app
+      node: 20.11.0
+      xcode: latest
+    scripts:
+      - name: Instalar dependencias web
+        script: npm ci
+      - name: Compilar la web app
+        script: npm run build
+      - name: Restaurar GoogleService-Info.plist (opcional, el real ya está en el repo)
+        script: |
+          if [ -n "$GOOGLE_SERVICE_INFO_PLIST" ]; then
+            echo "$GOOGLE_SERVICE_INFO_PLIST" | base64 --decode > ios/App/App/GoogleService-Info.plist
+          fi
+      - name: Sincronizar Capacitor con el proyecto iOS
+        script: npx cap sync ios
+      - name: Aplicar perfiles de firma
+        script: xcode-project use-profiles
+      - name: Número de build incremental (TestFlight)
+        script: |
+          cd ios/App
+          LATEST=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID" || echo 0)
+          agvtool new-version -all $((LATEST + 1))
+      - name: Compilar IPA
+        script: xcode-project build-ipa --project "$XCODE_PROJECT" --scheme "$XCODE_SCHEME"
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        # Cuando quieras enviar directo a revisión del App Store:
+        # submit_to_app_store: true
+
+  android-playstore:
+    name: Android · Build y subida a Play Console
+    instance_type: linux_x2
+    max_build_duration: 60
+    environment:
+      android_signing:
+        - patrulla_keystore
+      groups:
+        - firebase # GOOGLE_SERVICES_JSON en base64
+        - google_play # GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+      vars:
+        PACKAGE_NAME: com.patrullapatitas.app
+      node: 20.11.0
+      java: 17
+    scripts:
+      - name: Instalar dependencias web
+        script: npm ci
+      - name: Compilar la web app
+        script: npm run build
+      - name: Restaurar google-services.json (opcional, el real ya está en el repo)
+        script: |
+          if [ -n "$GOOGLE_SERVICES_JSON" ]; then
+            echo "$GOOGLE_SERVICES_JSON" | base64 --decode > android/app/google-services.json
+          fi
+      - name: Sincronizar Capacitor con el proyecto Android
+        script: npx cap sync android
+      - name: Compilar AAB firmado
+        script: |
+          cd android
+          # BUILD_NUMBER lo provee Codemagic; app/build.gradle lo usa como versionCode
+          ./gradlew bundleRelease
+    artifacts:
+      - android/app/build/outputs/**/*.aab
+      - android/app/build/outputs/**/mapping.txt
+    publishing:
+      google_play:
+        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+        track: internal # internal → closed → production a medida que avances

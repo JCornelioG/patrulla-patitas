@@ -1,0 +1,46 @@
+rules_version = '2';
+
+// Reglas de seguridad de Firestore para Patrulla Patitas.
+// Desplegar con: firebase deploy --only firestore:rules
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /pets/{petId} {
+      // Las alertas son públicas: cualquiera puede ver mascotas perdidas.
+      allow read: if true;
+
+      // Crear: solo usuarios autenticados (auth anónima), el documento debe
+      // declararlos como dueños y nacer sin avistamientos.
+      allow create: if request.auth != null
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.sightings == [];
+
+      // Actualizar: el dueño puede todo; cualquier otro usuario autenticado
+      // SOLO puede agregar exactamente un avistamiento (nunca modificar ni
+      // borrar los existentes, ni tocar otros campos).
+      allow update: if isOwner() || isSightingAppend();
+
+      allow delete: if isOwner();
+
+      function isOwner() {
+        return request.auth != null && resource.data.ownerId == request.auth.uid;
+      }
+
+      function isSightingAppend() {
+        return request.auth != null
+          && resource.data.status == 'lost'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['sightings'])
+          && request.resource.data.sightings.size() == resource.data.sightings.size() + 1;
+      }
+    }
+
+    // Tokens de notificaciones push: cada dispositivo escribe el suyo.
+    // Nadie los lee desde el cliente (solo las Cloud Functions, que usan
+    // el Admin SDK y no pasan por estas reglas).
+    match /devices/{token} {
+      allow read: if false;
+      allow write: if request.auth != null && request.resource.data.uid == request.auth.uid;
+      allow delete: if request.auth != null;
+    }
+  }
+}

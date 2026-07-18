@@ -1,0 +1,15 @@
+{
+  "appId": "com.patrullapatitas.app",
+  "appName": "Patrulla Patitas",
+  "webDir": "dist",
+  "ios": {
+    "contentInset": "always"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1200,
+      "backgroundColor": "#FFF9F2",
+      "launchAutoHide": true
+    }
+  }
+}

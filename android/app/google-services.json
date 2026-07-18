@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "987047171459",
+    "project_id": "patrulla-patitas",
+    "storage_bucket": "patrulla-patitas.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:987047171459:android:dc45281df191a1a0d792b6",
+        "android_client_info": {
+          "package_name": "com.patrullapatitas.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlN9qLuHLQmQl2rVdOD5RNXTZE2KQaYfs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
