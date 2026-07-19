@@ -8,7 +8,8 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         // En CI (Codemagic) el versionCode sube solo con cada build.
-        versionCode (System.getenv("BUILD_NUMBER") ?: "1").toInteger()
+        def ciBuildNumber = System.getenv("BUILD_NUMBER")
+        versionCode = (ciBuildNumber != null && !ciBuildNumber.isEmpty()) ? ciBuildNumber.toInteger() : 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
