@@ -102,6 +102,7 @@ workflows:
       - name: Compilar AAB firmado
         script: |
           cd android
+          chmod +x gradlew
           # BUILD_NUMBER lo provee Codemagic; app/build.gradle lo usa como versionCode
           ./gradlew bundleRelease
     artifacts:
