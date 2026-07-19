@@ -1,17 +1,10 @@
 import { useState } from 'react';
+import Icon from './Icons';
 import { getProfile, saveProfile } from '../services/profile';
 import { pickPhoto } from '../utils/photo';
 
-// Avatares ilustrados de respaldo cuando no se sube foto.
-const AVATARS = [
-  { emoji: '🐶', bg: '#FDE2CF' },
-  { emoji: '🐕', bg: '#F9D9B8' },
-  { emoji: '🐩', bg: '#F5E6D3' },
-  { emoji: '🐱', bg: '#E8DFF5' },
-  { emoji: '🐈', bg: '#D9EDE1' },
-  { emoji: '🐰', bg: '#FCE1EA' },
-  { emoji: '🦜', bg: '#D8ECF8' },
-];
+// Colores suaves para el avatar cuando no hay foto (por especie).
+const BG_BY_SPECIES = { Perro: '#FFF0D3', Gato: '#EAF2FF', Otro: '#DFF5E8' };
 
 export default function PetFormModal({ onCancel, onSave }) {
   const profile = getProfile();
@@ -23,7 +16,6 @@ export default function PetFormModal({ onCancel, onSave }) {
     color: '',
     size: 'Mediano',
     description: '',
-    avatar: 0,
     ownerName: profile.name ?? '',
     ownerPhone: profile.phone ?? '',
   });
@@ -43,8 +35,6 @@ export default function PetFormModal({ onCancel, onSave }) {
   function save() {
     if (!form.name.trim() || saving) return;
     setSaving(true);
-    const av = AVATARS[form.avatar];
-    // Recordamos el contacto para la próxima vez.
     saveProfile({ name: form.ownerName.trim(), phone: form.ownerPhone.trim() });
     onSave({
       name: form.name.trim(),
@@ -54,8 +44,7 @@ export default function PetFormModal({ onCancel, onSave }) {
       color: form.color.trim() || 'Sin especificar',
       size: form.size,
       description: form.description.trim() || 'Sin descripción todavía.',
-      emoji: av.emoji,
-      bg: av.bg,
+      bg: BG_BY_SPECIES[form.species] ?? BG_BY_SPECIES.Otro,
       photoDataUrl: photo,
       ownerName: form.ownerName.trim() || 'Vecino de la guardia',
       ownerPhone: form.ownerPhone.trim(),
@@ -63,48 +52,36 @@ export default function PetFormModal({ onCancel, onSave }) {
   }
 
   return (
-    <div className="overlay">
-      <div className="modal">
-        <h3>🐾 Nueva mascota</h3>
+    <div className="overlay" onClick={onCancel}>
+      <div className="modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Nueva mascota">
+        <div className="sheet-grip" />
+        <h3>Nueva mascota</h3>
 
         <div className="field">
           <span className="label">Foto</span>
           {photo ? (
             <div className="photo-row">
               <img className="photo-preview" src={photo} alt="Foto elegida" />
-              <button type="button" className="btn btn-ghost" onClick={() => setPhoto(null)}>
+              <button type="button" className="btn btn-secondary" onClick={() => setPhoto(null)}>
                 Quitar
               </button>
             </div>
           ) : (
-            <button type="button" className="btn btn-ghost" onClick={choosePhoto}>
-              📷 Agregar foto
+            <button type="button" className="btn btn-secondary" onClick={choosePhoto}>
+              <Icon name="camera" size={17} />
+              Agregar foto
             </button>
           )}
         </div>
 
-        {!photo && (
-          <div className="field">
-            <span className="label">Avatar (si no hay foto)</span>
-            <div className="emoji-row">
-              {AVATARS.map((a, i) => (
-                <button
-                  key={a.emoji}
-                  type="button"
-                  className={`emoji-opt${form.avatar === i ? ' sel' : ''}`}
-                  style={{ background: a.bg }}
-                  onClick={() => set('avatar', i)}
-                >
-                  {a.emoji}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
         <div className="field">
           <span className="label">Nombre *</span>
-          <input value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Firulais" />
+          <input
+            value={form.name}
+            onChange={(e) => set('name', e.target.value)}
+            placeholder="Firulais"
+            aria-label="Nombre de la mascota"
+          />
         </div>
 
         <div className="field-row">
@@ -138,21 +115,21 @@ export default function PetFormModal({ onCancel, onSave }) {
         </div>
 
         <div className="field">
-          <span className="label">¿Cómo hablamos de tu mascota?</span>
+          <span className="label">Sexo</span>
           <div className="pronoun-row">
             <button
               type="button"
-              className={`chip chip-toggle${form.pronoun === 'o' ? ' sel' : ''}`}
+              className={`chip-toggle${form.pronoun === 'o' ? ' sel' : ''}`}
               onClick={() => set('pronoun', 'o')}
             >
-              Perdido
+              Macho
             </button>
             <button
               type="button"
-              className={`chip chip-toggle${form.pronoun === 'a' ? ' sel' : ''}`}
+              className={`chip-toggle${form.pronoun === 'a' ? ' sel' : ''}`}
               onClick={() => set('pronoun', 'a')}
             >
-              Perdida
+              Hembra
             </button>
           </div>
         </div>
@@ -183,15 +160,17 @@ export default function PetFormModal({ onCancel, onSave }) {
           </div>
         </div>
         <p className="privacy-note">
-          🔒 Tu teléfono solo se muestra en la alerta si tu mascota se pierde, para que puedan avisarte.
+          <Icon name="shield" size={15} />
+          Tu teléfono solo se muestra en la alerta si tu mascota se pierde, para que puedan
+          avisarte.
         </p>
 
         <div className="modal-actions">
-          <button className="btn btn-ghost" onClick={onCancel}>
+          <button className="btn btn-secondary" onClick={onCancel}>
             Cancelar
           </button>
           <button className="btn btn-primary" onClick={save} disabled={!form.name.trim() || saving}>
-            {saving ? 'Guardando…' : 'Guardar 🐾'}
+            {saving ? 'Guardando…' : 'Guardar'}
           </button>
         </div>
       </div>

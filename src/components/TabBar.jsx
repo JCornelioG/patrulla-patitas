@@ -1,19 +1,44 @@
-const TABS = [
-  { id: 'alertas', icon: '🔔', label: 'Alertas' },
-  { id: 'mapa', icon: '🗺️', label: 'Mapa' },
-  { id: 'mis', icon: '🐾', label: 'Mis mascotas' },
-];
+import Icon from './Icons';
 
-export default function TabBar({ tab, onTab, alertCount }) {
+// Barra inferior de 4 acciones. "Reportar" es la acción principal:
+// botón coral elevado en el centro.
+export default function TabBar({ tab, onTab, onReport, alertCount }) {
   return (
-    <nav className="tabbar">
-      {TABS.map((t) => (
-        <button key={t.id} className={`tab${tab === t.id ? ' active' : ''}`} onClick={() => onTab(t.id)}>
-          <span className="icon">{t.icon}</span>
-          {t.label}
-          {t.id === 'alertas' && alertCount > 0 && <span className="badge">{alertCount}</span>}
-        </button>
-      ))}
+    <nav className="tabbar" aria-label="Navegación principal">
+      <button
+        className={`tab${tab === 'alertas' ? ' active' : ''}`}
+        onClick={() => onTab('alertas')}
+        aria-label={`Alertas${alertCount > 0 ? `, ${alertCount} activas` : ''}`}
+      >
+        <Icon name="bell" size={22} />
+        Alertas
+        {alertCount > 0 && <span className="badge">{alertCount}</span>}
+      </button>
+
+      <button
+        className={`tab${tab === 'mapa' ? ' active' : ''}`}
+        onClick={() => onTab('mapa')}
+        aria-label="Mapa"
+      >
+        <Icon name="map" size={22} />
+        Mapa
+      </button>
+
+      <button className="tab-fab" onClick={onReport} aria-label="Reportar">
+        <span className="tab-fab-circle">
+          <Icon name="plus" size={26} strokeWidth={2.2} />
+        </span>
+        Reportar
+      </button>
+
+      <button
+        className={`tab${tab === 'mis' ? ' active' : ''}`}
+        onClick={() => onTab('mis')}
+        aria-label="Mis mascotas"
+      >
+        <Icon name="paw" size={22} />
+        Mis mascotas
+      </button>
     </nav>
   );
 }

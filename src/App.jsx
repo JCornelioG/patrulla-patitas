@@ -12,8 +12,10 @@ import { usePlus } from './hooks/usePlus';
 import { useUserLocation } from './hooks/useUserLocation';
 import { approx } from './utils/geo';
 import { hapticAlert, hapticSuccess, hapticTap } from './utils/haptics';
+import Icon from './components/Icons';
 import PaywallModal from './components/PaywallModal';
 import Onboarding from './components/Onboarding';
+import ReportSheet from './components/ReportSheet';
 import TabBar from './components/TabBar';
 import AlertsFeed from './components/AlertsFeed';
 import MapTab from './components/MapTab';
@@ -29,8 +31,10 @@ export default function App() {
   const [now, setNow] = useState(Date.now());
   const [tab, setTab] = useState('alertas');
   const [selectedId, setSelectedId] = useState(null);
+  const [autoPlace, setAutoPlace] = useState(false);
   const [confirmLostId, setConfirmLostId] = useState(null);
   const [celebratingId, setCelebratingId] = useState(null);
+  const [reportOpen, setReportOpen] = useState(false);
   const [toast, setToast] = useState(null);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(() => {
@@ -81,7 +85,7 @@ export default function App() {
     initSubscription();
   }, []);
 
-  // Reloj global: alimenta cronómetros y el radio de alerta en expansión.
+  // Reloj global: cronómetros y radio de alerta en expansión.
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(t);
@@ -93,19 +97,16 @@ export default function App() {
     return () => clearTimeout(t);
   }, [toast]);
 
-  // Toda operación de datos pasa por acá: éxito → toast, fallo → aviso.
   async function run(action, okMsg) {
     try {
       await action();
       if (okMsg) setToast(okMsg);
     } catch (err) {
       console.error(err);
-      setToast('⚠️ No se pudo completar. Revisa tu conexión.');
+      setToast('No se pudo completar. Revisa tu conexión.');
     }
   }
 
-  // Enriquecemos los datos crudos con lo que la UI necesita saber:
-  // propiedad (own) y cómo mostrar a quien reportó cada avistamiento.
   const enriched = pets.map((p) => ({
     ...p,
     own: p.ownerId === uid,
@@ -115,17 +116,23 @@ export default function App() {
     })),
   }));
   const lostPets = enriched.filter((p) => p.status === 'lost');
+  const ownPets = enriched.filter((p) => p.own);
   const selected = enriched.find((p) => p.id === selectedId);
   const confirming = enriched.find((p) => p.id === confirmLostId);
   const celebrating = enriched.find((p) => p.id === celebratingId);
+
+  function openDetail(id, { placing = false } = {}) {
+    setAutoPlace(placing);
+    setSelectedId(id);
+  }
 
   function markLost(id) {
     // Privacidad: se publica la zona aproximada (~100 m), nunca el punto exacto.
     const zone = approx(userLocation.lat, userLocation.lng);
     hapticAlert();
     setConfirmLostId(null);
-    setSelectedId(id);
-    run(() => store.markLost(id, zone), '🚨 Alerta enviada a los vecinos más cercanos');
+    openDetail(id);
+    run(() => store.markLost(id, zone), 'Alerta enviada a los vecinos más cercanos.');
   }
 
   function addSighting(id, { lat, lng, note }) {
@@ -134,7 +141,7 @@ export default function App() {
     hapticTap();
     run(
       () => store.addSighting(id, { ...zone, note, reporterId: uid, reporterName }),
-      '💛 ¡Gracias! Tu avistamiento ya está en el rastro',
+      'Gracias, tu avistamiento ya está en el rastro.',
     );
   }
 
@@ -154,14 +161,30 @@ export default function App() {
     run(async () => {
       const photoUrl = photoDataUrl ? await store.uploadPhoto(photoDataUrl) : null;
       await store.addPet({ ...data, photoUrl });
-    }, `🐾 ${data.name} ya tiene su perfil en la guardia`);
+    }, `${data.name} ya tiene su perfil en la guardia.`);
+  }
+
+  // Flujos de la acción principal "Reportar".
+  function reportLost(petId) {
+    setReportOpen(false);
+    setConfirmLostId(petId);
+  }
+
+  function reportSeen(petId) {
+    setReportOpen(false);
+    openDetail(petId, { placing: true });
+  }
+
+  function reportGoAddPet() {
+    setReportOpen(false);
+    setTab('mis');
   }
 
   if (!store) {
     return (
       <div className="app">
         <div className="boot">
-          <span className="boot-paw">🐾</span>
+          <Icon name="paw" size={52} />
           Cargando la guardia…
         </div>
       </div>
@@ -171,27 +194,33 @@ export default function App() {
   return (
     <div className="app">
       <header className="header">
+        <span className="brand-logo">
+          <Icon name="paw" size={24} />
+        </span>
         <div className="brand">
-          <span className="brand-logo">🐾</span>
-          <span>
+          <span className="brand-name">
             Patrulla <em>Patitas</em>
           </span>
+          <span className="tagline">La comunidad que cuida a quienes no tienen voz</span>
         </div>
-        <span className="tagline">La guardia ciudadana de mascotas · siempre gratis 💛</span>
       </header>
 
       {store.mode === 'local' && (
-        <div className="demo-banner">
-          Modo demo con datos locales de ejemplo · configura Firebase para activar las alertas reales
-        </div>
+        <div className="demo-banner">Modo demo con datos locales de ejemplo</div>
       )}
 
       <main>
         {tab === 'alertas' && (
-          <AlertsFeed pets={lostPets} now={now} userLocation={userLocation} onOpen={setSelectedId} />
+          <AlertsFeed pets={lostPets} now={now} userLocation={userLocation} onOpen={openDetail} />
         )}
         {tab === 'mapa' && (
-          <MapTab pets={lostPets} now={now} userLocation={userLocation} onOpen={setSelectedId} />
+          <MapTab
+            pets={lostPets}
+            now={now}
+            userLocation={userLocation}
+            onOpen={openDetail}
+            onReportSighting={(id) => openDetail(id, { placing: true })}
+          />
         )}
         {tab === 'mis' && (
           <MyPets
@@ -199,7 +228,7 @@ export default function App() {
             now={now}
             isPlus={isPlus}
             canLink={store.mode === 'firebase'}
-            onOpen={setSelectedId}
+            onOpen={openDetail}
             onRequestLost={setConfirmLostId}
             onAddPet={addPet}
             onOpenPaywall={() => setShowPaywall(true)}
@@ -208,7 +237,7 @@ export default function App() {
         )}
       </main>
 
-      <TabBar tab={tab} onTab={setTab} alertCount={lostPets.length} />
+      <TabBar tab={tab} onTab={setTab} onReport={() => setReportOpen(true)} alertCount={lostPets.length} />
 
       {selected && (
         <PetDetail
@@ -216,7 +245,11 @@ export default function App() {
           now={now}
           userLocation={userLocation}
           isPlus={isPlus}
-          onClose={() => setSelectedId(null)}
+          initialPlacing={autoPlace}
+          onClose={() => {
+            setSelectedId(null);
+            setAutoPlace(false);
+          }}
           onAddSighting={addSighting}
           onRequestLost={setConfirmLostId}
           onMarkFound={markFound}
@@ -224,10 +257,14 @@ export default function App() {
         />
       )}
 
-      {showPaywall && (
-        <PaywallModal
-          onClose={() => setShowPaywall(false)}
-          onPurchased={() => setToast('✨ ¡Bienvenido a Patitas Plus!')}
+      {reportOpen && (
+        <ReportSheet
+          ownPets={ownPets}
+          lostPets={lostPets}
+          onLost={reportLost}
+          onSeen={reportSeen}
+          onGoAddPet={reportGoAddPet}
+          onClose={() => setReportOpen(false)}
         />
       )}
 
@@ -240,6 +277,13 @@ export default function App() {
       )}
 
       {celebrating && <FoundCelebration pet={celebrating} onClose={() => closeCase(celebrating.id)} />}
+
+      {showPaywall && (
+        <PaywallModal
+          onClose={() => setShowPaywall(false)}
+          onPurchased={() => setToast('Bienvenido a Patitas Plus.')}
+        />
+      )}
 
       {showOnboarding && <Onboarding onDone={finishOnboarding} />}
 

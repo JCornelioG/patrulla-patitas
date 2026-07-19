@@ -25,8 +25,7 @@ export function demoPets(uid) {
       size: 'Pequeña',
       description:
         'Tímida con desconocidos: no intentes agarrarla, solo avisa dónde está. Collar morado con cascabel.',
-      emoji: '🐱',
-      bg: '#E8DFF5',
+      bg: '#EAF2FF',
       photoUrl: null,
       ownerName: 'José (tú)',
       ownerPhone: '+51 999 123 456',
@@ -48,8 +47,7 @@ export function demoPets(uid) {
       size: 'Grande',
       description:
         'Collar rojo con chapita. Muy amistoso pero está asustado; responde a su nombre y le encantan las galletas.',
-      emoji: '🐕',
-      bg: '#FDE2CF',
+      bg: '#FFF0D3',
       photoUrl: null,
       ownerName: 'Marina G.',
       ownerPhone: '+51 987 555 111',
@@ -99,8 +97,7 @@ export function demoPets(uid) {
       size: 'Mediano',
       description:
         'Ojos celestes, sin collar (se lo quitó al escaparse). Suele subirse a los techos. No es agresivo.',
-      emoji: '🐈',
-      bg: '#D9EDE1',
+      bg: '#EAF2FF',
       photoUrl: null,
       ownerName: 'Valentina S.',
       ownerPhone: '+51 991 222 333',
@@ -141,8 +138,7 @@ export function demoPets(uid) {
       size: 'Pequeño',
       description:
         'Recién operado, necesita su medicación. Lleva una chompa azul. Se asusta con los ruidos fuertes.',
-      emoji: '🐩',
-      bg: '#F5E6D3',
+      bg: '#FFF0D3',
       photoUrl: null,
       ownerName: 'Ramiro D.',
       ownerPhone: '+51 982 444 777',

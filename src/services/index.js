@@ -8,8 +8,20 @@ import { isFirebaseConfigured } from '../config/firebase';
 //
 // El import dinámico hace que el SDK de Firebase ni siquiera se descargue
 // cuando la app corre en modo demo.
+//
+// Override de desarrollo: ?demo=1 en la URL fuerza el modo local con datos
+// de prueba (útil para revisar el diseño o tomar capturas sin tocar la base
+// de producción). No afecta a las apps nativas.
+function forceDemo() {
+  try {
+    return new URLSearchParams(window.location.search).get('demo') === '1';
+  } catch {
+    return false;
+  }
+}
+
 export async function createStore() {
-  if (isFirebaseConfigured()) {
+  if (isFirebaseConfigured() && !forceDemo()) {
     const { createFirebaseStore } = await import('./firebaseStore.js');
     return createFirebaseStore();
   }

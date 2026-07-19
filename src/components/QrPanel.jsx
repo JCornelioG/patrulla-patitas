@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import PetAvatar from './PetAvatar';
+import Icon from './Icons';
 import { qrDataUrl, petVCard } from '../utils/qr';
 import { saveOrShareImage } from '../utils/share';
 
@@ -21,25 +22,25 @@ export default function QrPanel({ pet, onClose }) {
     const ctx = canvas.getContext('2d');
     ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(0, 0, 900, 1160);
-    ctx.strokeStyle = '#FF6B4A';
-    ctx.lineWidth = 10;
-    ctx.strokeRect(20, 20, 860, 1120);
+    ctx.strokeStyle = '#FF6258';
+    ctx.lineWidth = 8;
+    ctx.strokeRect(24, 24, 852, 1112);
     ctx.textAlign = 'center';
-    ctx.fillStyle = '#3B2E28';
-    ctx.font = "900 64px Nunito, 'Segoe UI', sans-serif";
-    ctx.fillText(`¡Hola! Soy ${pet.name}`, 450, 120);
+    ctx.fillStyle = '#262129';
+    ctx.font = "800 60px Manrope, 'Segoe UI', sans-serif";
+    ctx.fillText(`Hola, soy ${pet.name}`, 450, 124);
     const img = new Image();
     await new Promise((r) => {
       img.onload = r;
       img.src = qr;
     });
     ctx.drawImage(img, 130, 180, 640, 640);
-    ctx.font = "800 44px Nunito, 'Segoe UI', sans-serif";
-    ctx.fillText('Si me encontraste, escanéame', 450, 910);
-    ctx.fillText('con la cámara de tu celular 📱', 450, 970);
-    ctx.fillStyle = '#FF6B4A';
-    ctx.font = "800 36px Nunito, 'Segoe UI', sans-serif";
-    ctx.fillText('🐾 Patrulla Patitas', 450, 1070);
+    ctx.font = "700 42px Manrope, 'Segoe UI', sans-serif";
+    ctx.fillText('Si me encontraste, escanéame', 450, 912);
+    ctx.fillText('con la cámara de tu celular', 450, 968);
+    ctx.fillStyle = '#E94F47';
+    ctx.font = "700 34px Manrope, 'Segoe UI', sans-serif";
+    ctx.fillText('Patrulla Patitas', 450, 1068);
     await saveOrShareImage(canvas.toDataURL('image/png'), `chapita-${pet.name}.png`, `Chapita QR de ${pet.name}`);
   }
 
@@ -47,35 +48,45 @@ export default function QrPanel({ pet, onClose }) {
     <div className="detail panel">
       <div className="detail-top">
         <button className="btn-back" onClick={onClose} aria-label="Volver">
-          ←
+          <Icon name="back" size={20} />
         </button>
-        <span className="detail-title">Chapita QR</span>
-        <span className="plus-badge">PLUS</span>
+        <span className="detail-title">
+          Chapita QR
+          <span className="status-chip st-seen">Plus</span>
+        </span>
       </div>
 
       <div className="detail-scroll" style={{ textAlign: 'center' }}>
-        <div className="detail-hero" style={{ justifyContent: 'center' }}>
-          <PetAvatar pet={pet} size={64} />
-          <div style={{ textAlign: 'left' }}>
-            <h2 style={{ margin: 0 }}>{pet.name}</h2>
-            <span className="muted small">Contacto: {pet.ownerPhone || 'sin teléfono registrado'}</span>
+        <div className="detail-hero">
+          <PetAvatar pet={pet} size="sm" />
+          <div>
+            <h2 style={{ margin: 0, fontSize: 20 }}>{pet.name}</h2>
+            <span className="meta">Contacto: {pet.ownerPhone || 'sin teléfono registrado'}</span>
           </div>
         </div>
 
-        <p className="muted small">
+        <p className="meta">
           Imprime este QR y pégalo en la chapita del collar. Quien lo escanee con la cámara del
           celular ve tu contacto al instante y <strong>no necesita tener la app</strong>.
         </p>
 
-        {qr ? <img className="qr-img" src={qr} alt={`QR de ${pet.name}`} /> : <div className="empty">Generando QR…</div>}
+        {qr ? (
+          <img className="qr-img" src={qr} alt={`QR de ${pet.name}`} />
+        ) : (
+          <div className="empty-state">
+            <p>Generando QR…</p>
+          </div>
+        )}
 
         <button className="btn btn-primary btn-big" onClick={downloadTag} disabled={!qr}>
-          ⬇️ Descargar chapita para imprimir
+          <Icon name="share" size={17} />
+          Descargar chapita para imprimir
         </button>
 
         {!pet.ownerPhone && (
           <p className="privacy-note">
-            ⚠️ Esta mascota no tiene teléfono de contacto: el QR mostrará solo el nombre. Agrégalo al
+            <Icon name="alert" size={15} />
+            Esta mascota no tiene teléfono de contacto: el QR mostrará solo el nombre. Agrégalo al
             crear o editar la mascota.
           </p>
         )}

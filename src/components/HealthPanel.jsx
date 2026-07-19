@@ -1,15 +1,24 @@
 import { useState } from 'react';
 import { Capacitor } from '@capacitor/core';
 import PetAvatar from './PetAvatar';
+import Icon from './Icons';
 import { getHealth, saveHealth, RECORD_TYPES, REPEAT_OPTIONS } from '../services/health';
 import { scheduleReminder, cancelReminder } from '../services/notifications';
 import { formatDate } from '../utils/geo';
 
 const TABS = [
-  { id: 'registros', label: '🩺 Registros' },
-  { id: 'peso', label: '⚖️ Peso' },
-  { id: 'recordatorios', label: '⏰ Recordatorios' },
+  { id: 'registros', label: 'Registros', icon: 'clipboard' },
+  { id: 'peso', label: 'Peso', icon: 'scale' },
+  { id: 'recordatorios', label: 'Recordatorios', icon: 'bellRing' },
 ];
+
+const RECORD_ICON = {
+  Vacuna: 'pill',
+  Antiparasitario: 'pill',
+  Consulta: 'health',
+  Medicación: 'pill',
+  Otro: 'clipboard',
+};
 
 // Cartilla sanitaria (Patitas Plus): registros médicos, curva de peso y
 // recordatorios con notificación local. Datos privados, en el dispositivo.
@@ -43,51 +52,51 @@ export default function HealthPanel({ pet, initialTab = 'registros', onClose }) 
     <div className="detail panel">
       <div className="detail-top">
         <button className="btn-back" onClick={onClose} aria-label="Volver">
-          ←
+          <Icon name="back" size={20} />
         </button>
-        <span className="detail-title">Cartilla de {pet.name}</span>
-        <span className="plus-badge">PLUS</span>
+        <span className="detail-title">
+          Cartilla de {pet.name}
+          <span className="status-chip st-seen">Plus</span>
+        </span>
       </div>
 
       <div className="tabs-row">
         {TABS.map((t) => (
           <button
             key={t.id}
-            className={`chip chip-toggle${tab === t.id ? ' sel' : ''}`}
+            className={`fchip${tab === t.id ? ' active' : ''}`}
             onClick={() => setTab(t.id)}
           >
+            <Icon name={t.icon} size={16} />
             {t.label}
           </button>
         ))}
       </div>
 
       <div className="detail-scroll">
-        <div className="detail-hero" style={{ marginBottom: 6 }}>
-          <PetAvatar pet={pet} size={56} />
-          <p className="muted small" style={{ margin: 0 }}>
-            {tab === 'registros' && 'Vacunas, tratamientos y consultas: el historial completo de salud.'}
-            {tab === 'peso' && 'Registra el peso en cada control para seguir su evolución.'}
-            {tab === 'recordatorios' && 'Nunca más una vacuna vencida: te avisamos a tiempo.'}
-          </p>
-        </div>
+        <p className="meta" style={{ marginTop: 0 }}>
+          {tab === 'registros' && 'Vacunas, tratamientos y consultas: el historial completo de salud.'}
+          {tab === 'peso' && 'Registra el peso en cada control para seguir su evolución.'}
+          {tab === 'recordatorios' && 'Nunca más una vacuna vencida: te avisamos a tiempo.'}
+        </p>
 
         {tab === 'registros' && (
           <>
-            {records.length === 0 && <div className="empty">Todavía no hay registros 🩺</div>}
+            {records.length === 0 && <EmptyRow text="Todavía no hay registros" icon="clipboard" />}
             {records.map((r) => (
               <div className="sight-row" key={r.id}>
-                <span className="sight-num" style={{ background: '#E8DFF5', color: '#5B4A7A' }}>
-                  {r.type === 'Vacuna' ? '💉' : r.type === 'Antiparasitario' ? '🪱' : r.type === 'Consulta' ? '🩺' : r.type === 'Medicación' ? '💊' : '📋'}
+                <span className="icon-chip">
+                  <Icon name={RECORD_ICON[r.type] ?? 'clipboard'} size={20} />
                 </span>
                 <div style={{ flex: 1 }}>
-                  <strong>{r.name}</strong> · <span className="muted small">{r.type}</span>
-                  <p style={{ margin: '2px 0' }} className="small">
+                  <strong>{r.name}</strong> <span className="meta">· {r.type}</span>
+                  <p className="time-note">
                     {formatDate(r.date)}
                     {r.notes ? ` · ${r.notes}` : ''}
                   </p>
                 </div>
                 <button className="row-del" onClick={() => remove('records', r.id)} aria-label="Eliminar">
-                  ✕
+                  <Icon name="x" size={16} />
                 </button>
               </div>
             ))}
@@ -96,28 +105,28 @@ export default function HealthPanel({ pet, initialTab = 'registros', onClose }) 
 
         {tab === 'peso' && (
           <>
-            {weights.length === 0 && <div className="empty">Sin pesos registrados ⚖️</div>}
+            {weights.length === 0 && <EmptyRow text="Sin pesos registrados" icon="scale" />}
             {weights.map((w, i) => {
               const prev = weights[i - 1];
               const delta = prev ? w.kg - prev.kg : 0;
               return (
                 <div className="sight-row" key={w.id}>
-                  <span className="sight-num" style={{ background: '#D9EDE1', color: '#1E7A4C' }}>⚖️</span>
+                  <span className="icon-chip">
+                    <Icon name="scale" size={20} />
+                  </span>
                   <div style={{ flex: 1 }}>
                     <strong>{w.kg} kg</strong>
                     {prev && (
-                      <span className={`small ${delta >= 0 ? '' : 'muted'}`}>
+                      <span className="meta">
                         {' '}
                         ({delta >= 0 ? '+' : ''}
                         {delta.toFixed(1)} kg)
                       </span>
                     )}
-                    <p style={{ margin: '2px 0' }} className="small muted">
-                      {formatDate(w.date)}
-                    </p>
+                    <p className="time-note">{formatDate(w.date)}</p>
                   </div>
                   <button className="row-del" onClick={() => remove('weights', w.id)} aria-label="Eliminar">
-                    ✕
+                    <Icon name="x" size={16} />
                   </button>
                 </div>
               );
@@ -129,23 +138,26 @@ export default function HealthPanel({ pet, initialTab = 'registros', onClose }) 
           <>
             {!Capacitor.isNativePlatform() && (
               <p className="privacy-note">
-                📱 Las notificaciones suenan en la app instalada en tu teléfono; en la web los
+                <Icon name="bell" size={15} />
+                Las notificaciones suenan en la app instalada en tu teléfono; en la web los
                 recordatorios solo se guardan.
               </p>
             )}
-            {reminders.length === 0 && <div className="empty">Sin recordatorios ⏰</div>}
+            {reminders.length === 0 && <EmptyRow text="Sin recordatorios" icon="bellRing" />}
             {reminders.map((r) => (
               <div className="sight-row" key={r.id}>
-                <span className="sight-num" style={{ background: '#FFF3D6', color: '#8A6100' }}>⏰</span>
+                <span className="icon-chip">
+                  <Icon name="bellRing" size={20} />
+                </span>
                 <div style={{ flex: 1 }}>
                   <strong>{r.title}</strong>
-                  <p style={{ margin: '2px 0' }} className="small muted">
+                  <p className="time-note">
                     Próximo: {formatDate(r.at)} ·{' '}
                     {REPEAT_OPTIONS.find((o) => o.id === r.repeat)?.label ?? 'Una sola vez'}
                   </p>
                 </div>
                 <button className="row-del" onClick={() => remove('reminders', r.id)} aria-label="Eliminar">
-                  ✕
+                  <Icon name="x" size={16} />
                 </button>
               </div>
             ))}
@@ -153,8 +165,8 @@ export default function HealthPanel({ pet, initialTab = 'registros', onClose }) 
         )}
 
         <button className="btn btn-primary btn-big" onClick={() => setAdding(true)}>
-          ＋ Agregar{' '}
-          {tab === 'registros' ? 'registro' : tab === 'peso' ? 'peso' : 'recordatorio'}
+          <Icon name="plus" size={18} />
+          Agregar {tab === 'registros' ? 'registro' : tab === 'peso' ? 'peso' : 'recordatorio'}
         </button>
       </div>
 
@@ -163,6 +175,17 @@ export default function HealthPanel({ pet, initialTab = 'registros', onClose }) 
       {adding && tab === 'recordatorios' && (
         <ReminderForm onCancel={() => setAdding(false)} onSave={(d) => add('reminders', d)} />
       )}
+    </div>
+  );
+}
+
+function EmptyRow({ text, icon }) {
+  return (
+    <div className="empty-state">
+      <span className="empty-illu">
+        <Icon name={icon} size={30} />
+      </span>
+      <p>{text}</p>
     </div>
   );
 }
@@ -184,9 +207,10 @@ function RecordForm({ onCancel, onSave }) {
   const [form, setForm] = useState({ type: 'Vacuna', name: '', date: todayInput(), notes: '' });
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
   return (
-    <div className="overlay">
-      <div className="modal">
-        <h3>🩺 Nuevo registro</h3>
+    <div className="overlay" onClick={onCancel}>
+      <div className="modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Nuevo registro">
+        <div className="sheet-grip" />
+        <h3>Nuevo registro</h3>
         <div className="field">
           <span className="label">Tipo</span>
           <select value={form.type} onChange={(e) => set('type', e.target.value)}>
@@ -208,7 +232,7 @@ function RecordForm({ onCancel, onSave }) {
           <input value={form.notes} onChange={(e) => set('notes', e.target.value)} placeholder="Veterinaria, lote, dosis…" />
         </div>
         <div className="modal-actions">
-          <button className="btn btn-ghost" onClick={onCancel}>
+          <button className="btn btn-secondary" onClick={onCancel}>
             Cancelar
           </button>
           <button
@@ -229,9 +253,10 @@ function WeightForm({ onCancel, onSave }) {
   const [date, setDate] = useState(todayInput());
   const valid = Number(kg) > 0;
   return (
-    <div className="overlay">
-      <div className="modal">
-        <h3>⚖️ Nuevo peso</h3>
+    <div className="overlay" onClick={onCancel}>
+      <div className="modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Nuevo peso">
+        <div className="sheet-grip" />
+        <h3>Nuevo peso</h3>
         <div className="field-row">
           <div className="field">
             <span className="label">Peso (kg) *</span>
@@ -243,7 +268,7 @@ function WeightForm({ onCancel, onSave }) {
           </div>
         </div>
         <div className="modal-actions">
-          <button className="btn btn-ghost" onClick={onCancel}>
+          <button className="btn btn-secondary" onClick={onCancel}>
             Cancelar
           </button>
           <button className="btn btn-primary" disabled={!valid} onClick={() => onSave({ kg: Number(kg), date: dateToMs(date) })}>
@@ -261,9 +286,10 @@ function ReminderForm({ onCancel, onSave }) {
   const [form, setForm] = useState({ title: '', at: now.toISOString().slice(0, 16), repeat: 'none' });
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
   return (
-    <div className="overlay">
-      <div className="modal">
-        <h3>⏰ Nuevo recordatorio</h3>
+    <div className="overlay" onClick={onCancel}>
+      <div className="modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Nuevo recordatorio">
+        <div className="sheet-grip" />
+        <h3>Nuevo recordatorio</h3>
         <div className="field">
           <span className="label">Título *</span>
           <input value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Pipeta antipulgas" />
@@ -283,7 +309,7 @@ function ReminderForm({ onCancel, onSave }) {
           </select>
         </div>
         <div className="modal-actions">
-          <button className="btn btn-ghost" onClick={onCancel}>
+          <button className="btn btn-secondary" onClick={onCancel}>
             Cancelar
           </button>
           <button

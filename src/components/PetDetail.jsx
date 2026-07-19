@@ -5,6 +5,7 @@ import SightingModal from './SightingModal';
 import HealthPanel from './HealthPanel';
 import QrPanel from './QrPanel';
 import FlyerModal from './FlyerModal';
+import Icon from './Icons';
 import { SUPPORT_EMAIL } from '../config/constants';
 import { alertRadius, neighborsAlerted, formatDistance, formatElapsed, formatClock } from '../utils/geo';
 
@@ -13,48 +14,54 @@ export default function PetDetail({
   now,
   userLocation,
   isPlus,
+  initialPlacing = false,
   onClose,
   onAddSighting,
   onRequestLost,
   onMarkFound,
   onOpenPaywall,
 }) {
-  const [placing, setPlacing] = useState(false);
+  const [placing, setPlacing] = useState(initialPlacing && pet.status === 'lost');
   const [pending, setPending] = useState(null); // punto elegido en el mapa
   const [panel, setPanel] = useState(null); // {type:'salud',tab} | {type:'qr'}
   const [showFlyer, setShowFlyer] = useState(false);
-
-  // Las funciones Plus abren el paywall si no hay suscripción activa.
-  const plusOr = (fn) => (isPlus ? fn() : onOpenPaywall());
 
   const lost = pet.status === 'lost';
   const elapsed = lost ? now - pet.lostAt : 0;
   const radius = alertRadius(elapsed);
   const trail = [...pet.sightings].sort((a, b) => a.at - b.at);
 
+  const plusOr = (fn) => (isPlus ? fn() : onOpenPaywall());
+
   return (
     <div className="detail">
       <div className="detail-top">
         <button className="btn-back" onClick={onClose} aria-label="Volver">
-          ←
+          <Icon name="back" size={20} />
         </button>
-        <span className="detail-title">{lost ? '🚨 Alerta activa' : 'Perfil'}</span>
+        <span className="detail-title">
+          {lost && <Icon name="alert" size={17} />}
+          {lost ? 'Alerta activa' : 'Perfil'}
+        </span>
       </div>
 
       <div className="detail-scroll">
         <div className="detail-hero">
-          <PetAvatar pet={pet} size={92} />
+          <PetAvatar pet={pet} size="lg" />
           <div>
             <h2>{pet.name}</h2>
-            <p className="muted" style={{ margin: '0 0 6px' }}>
+            <p className="meta" style={{ margin: '0 0 8px' }}>
               {pet.species} · {pet.breed}
             </p>
             {lost ? (
-              <span className="chip chip-lost">
+              <span className="status-chip st-lost">
                 Perdid{pet.pronoun} hace {formatElapsed(elapsed)}
               </span>
             ) : (
-              <span className="chip chip-home">😊 En casa</span>
+              <span className="status-chip st-home">
+                <Icon name="home" size={13} />
+                En casa
+              </span>
             )}
           </div>
         </div>
@@ -82,8 +89,9 @@ export default function PetDetail({
             <strong>{pet.ownerName}</strong>
           </div>
           {pet.ownerPhone && (
-            <a className="btn btn-ghost" href={`tel:${pet.ownerPhone.replace(/\s/g, '')}`}>
-              📞 Llamar
+            <a className="btn btn-secondary" href={`tel:${pet.ownerPhone.replace(/\s/g, '')}`}>
+              <Icon name="phone" size={16} />
+              Llamar
             </a>
           )}
         </div>
@@ -91,10 +99,16 @@ export default function PetDetail({
         {lost && (
           <>
             <div className="card radius-card">
-              <strong>📡 Radio de alerta: {formatDistance(radius)}</strong>
-              <span className="muted small">
-                ~{neighborsAlerted(radius)} vecinos alertados · el radio se expande solo mientras no aparezca
+              <span className="icon-chip">
+                <Icon name="zone" size={22} />
               </span>
+              <div>
+                <strong>Radio de alerta: {formatDistance(radius)}</strong>
+                <span>
+                  ~{neighborsAlerted(radius)} vecinos alertados · se expande solo mientras no
+                  aparezca
+                </span>
+              </div>
             </div>
 
             <AlertMap
@@ -107,11 +121,14 @@ export default function PetDetail({
               onPlace={(latlng) => setPending(latlng)}
               height={300}
             />
-            <p className="privacy-note">🔒 Por privacidad mostramos zonas aproximadas, nunca direcciones exactas.</p>
+            <p className="privacy-note">
+              <Icon name="shield" size={15} />
+              Por privacidad mostramos zonas aproximadas, nunca direcciones exactas.
+            </p>
 
             {placing ? (
               <button
-                className="btn btn-ghost btn-big"
+                className="btn btn-secondary btn-big"
                 onClick={() => {
                   setPlacing(false);
                   setPending(null);
@@ -121,22 +138,24 @@ export default function PetDetail({
               </button>
             ) : (
               <button className="btn btn-primary btn-big" onClick={() => setPlacing(true)}>
-                👀 ¡LO VI AQUÍ!
+                <Icon name="eye" size={18} />
+                Lo vi aquí
               </button>
             )}
 
             <section className="sightings">
               <h3>Rastro de avistamientos</h3>
               {trail.length === 0 && (
-                <p className="muted">Todavía no hay avistamientos. Comparte la alerta con el barrio 🙏</p>
+                <p className="meta">Todavía no hay avistamientos. Comparte la alerta con el barrio.</p>
               )}
               {[...trail].reverse().map((s, i) => (
                 <div className="sight-row" key={s.id}>
                   <span className={`sight-num${i === 0 ? ' latest' : ''}`}>{trail.length - i}</span>
                   <div>
-                    <strong>{formatClock(s.at)}</strong> · hace {formatElapsed(now - s.at)}
+                    <strong>{formatClock(s.at)}</strong>{' '}
+                    <span className="time-note">· hace {formatElapsed(now - s.at)}</span>
                     {s.note && <p>{s.note}</p>}
-                    <span className="muted small">Reportado por {s.reporterDisplay}</span>
+                    <span className="meta">Reportado por {s.reporterDisplay}</span>
                   </div>
                 </div>
               ))}
@@ -144,13 +163,15 @@ export default function PetDetail({
 
             {/* El flyer es GRATIS para toda mascota perdida: es rescate.
                 Con Plus incluye además el QR de contacto. */}
-            <button className="btn btn-ghost btn-big" onClick={() => setShowFlyer(true)}>
-              📄 Generar flyer de búsqueda
+            <button className="btn btn-secondary btn-big" onClick={() => setShowFlyer(true)}>
+              <Icon name="file" size={17} />
+              Generar flyer de búsqueda
             </button>
 
             {pet.own && (
-              <button className="btn btn-green btn-big" onClick={() => onMarkFound(pet.id)}>
-                🏠 ¡APARECIÓ!
+              <button className="btn btn-success btn-big" onClick={() => onMarkFound(pet.id)}>
+                <Icon name="home" size={18} />
+                Ya apareció
               </button>
             )}
 
@@ -159,53 +180,66 @@ export default function PetDetail({
         )}
 
         {!lost && pet.own && (
-          <button className="btn btn-danger btn-big" onClick={() => onRequestLost(pet.id)}>
-            🚨 SE PERDIÓ
+          <button className="btn btn-primary btn-big" onClick={() => onRequestLost(pet.id)}>
+            <Icon name="alert" size={18} />
+            Se perdió
           </button>
         )}
 
         {pet.own && (
           <section className="care">
             <h3>
-              Cuidados <span className="plus-badge">PLUS</span>
+              Cuidados
+              <span className="status-chip st-seen">Plus</span>
             </h3>
             <div className="care-grid">
               <button
                 className="care-tile"
                 onClick={() => plusOr(() => setPanel({ type: 'salud', tab: 'registros' }))}
               >
-                <span className="care-icon">🩺</span>
+                <Icon name="health" size={24} />
                 Cartilla sanitaria
-                {!isPlus && <span className="lock">🔒</span>}
+                {!isPlus && (
+                  <span className="lock">
+                    <Icon name="sparkle" size={13} />
+                  </span>
+                )}
               </button>
               <button
                 className="care-tile"
                 onClick={() => plusOr(() => setPanel({ type: 'salud', tab: 'recordatorios' }))}
               >
-                <span className="care-icon">⏰</span>
+                <Icon name="bellRing" size={24} />
                 Recordatorios
-                {!isPlus && <span className="lock">🔒</span>}
+                {!isPlus && (
+                  <span className="lock">
+                    <Icon name="sparkle" size={13} />
+                  </span>
+                )}
               </button>
               <button className="care-tile" onClick={() => plusOr(() => setPanel({ type: 'qr' }))}>
-                <span className="care-icon">🔖</span>
+                <Icon name="qr" size={24} />
                 Chapita QR
-                {!isPlus && <span className="lock">🔒</span>}
+                {!isPlus && (
+                  <span className="lock">
+                    <Icon name="sparkle" size={13} />
+                  </span>
+                )}
               </button>
             </div>
           </section>
         )}
 
-        {/* Requisito de contenido generado por usuarios (App Store 1.2):
-            canal simple para reportar contenido inapropiado. */}
+        {/* Requisito de contenido generado por usuarios (App Store 1.2). */}
         {!pet.own && (
-          <p className="privacy-note center">
+          <p className="privacy-note center" style={{ marginTop: 24 }}>
             <a href={`mailto:${SUPPORT_EMAIL}?subject=Reporte de contenido: ${pet.id}`}>
-              📣 Reportar contenido inapropiado
+              Reportar contenido inapropiado
             </a>
           </p>
         )}
 
-        {/* FUTURO: chapita QR. Quien escanee el collar llega a este perfil. */}
+        {/* FUTURO: chapita QR: quien escanee el collar llega a este perfil. */}
       </div>
 
       {pending && (

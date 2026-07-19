@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Icon from './Icons';
 import { generateFlyer } from '../utils/flyer';
 import { qrDataUrl, petVCard } from '../utils/qr';
 import { saveOrShareImage } from '../utils/share';
@@ -21,18 +22,22 @@ export default function FlyerModal({ pet, isPlus, onOpenPaywall, onClose }) {
   }, [pet, isPlus]);
 
   return (
-    <div className="overlay">
-      <div className="modal">
-        <h3>📄 Flyer de búsqueda</h3>
+    <div className="overlay" onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Flyer de búsqueda">
+        <div className="sheet-grip" />
+        <h3>Flyer de búsqueda</h3>
         {img ? (
           <img className="flyer-preview" src={img} alt={`Flyer de ${pet.name}`} />
         ) : (
-          <div className="empty">Generando flyer…</div>
+          <div className="empty-state">
+            <p>Generando flyer…</p>
+          </div>
         )}
 
         {!isPlus && (
           <p className="privacy-note">
-            ✨ Con <strong>Patitas Plus</strong> el flyer incluye un QR escaneable con tu contacto.{' '}
+            <Icon name="sparkle" size={15} />
+            Con <strong>Patitas Plus</strong> el flyer incluye un QR escaneable con tu contacto.{' '}
             <button type="button" className="link-btn" onClick={onOpenPaywall}>
               Ver Plus
             </button>
@@ -40,7 +45,7 @@ export default function FlyerModal({ pet, isPlus, onOpenPaywall, onClose }) {
         )}
 
         <div className="modal-actions">
-          <button className="btn btn-ghost" onClick={onClose}>
+          <button className="btn btn-secondary" onClick={onClose}>
             Cerrar
           </button>
           <button
@@ -48,7 +53,8 @@ export default function FlyerModal({ pet, isPlus, onOpenPaywall, onClose }) {
             disabled={!img}
             onClick={() => saveOrShareImage(img, `se-perdio-${pet.name}.png`, `Flyer de búsqueda de ${pet.name}`)}
           >
-            ⬇️ Descargar / compartir
+            <Icon name="share" size={16} />
+            Descargar / compartir
           </button>
         </div>
       </div>

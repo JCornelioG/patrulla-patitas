@@ -14,15 +14,42 @@ import { formatClock } from './geo';
 
 const W = 1240;
 const H = 1754;
-const CORAL = '#FF6B4A';
+const CORAL = '#FF6258';
 const CORAL_SOFT = '#FFE3DC';
-const INK = '#3B2E28';
-const MUTED = '#8A7568';
-const CREAM = '#FFF9F2';
-const LINE = '#F2E6DA';
+const INK = '#262129';
+const MUTED = '#746A70';
+const CREAM = '#FFF9F4';
+const LINE = '#EDE4DC';
 
-const font = (px, weight = 800) => `${weight} ${px}px Nunito, 'Segoe UI', sans-serif`;
-const emojiFont = (px) => `400 ${px}px 'Segoe UI Emoji', 'Apple Color Emoji', sans-serif`;
+const font = (px, weight = 700) => `${weight} ${px}px Manrope, 'Segoe UI', sans-serif`;
+
+// Dibuja la huella de la marca (misma forma que el icono SVG) centrada en
+// (cx, cy) a la escala dada, sin depender de emojis del sistema.
+function drawPaw(ctx, cx, cy, scale, color) {
+  ctx.save();
+  ctx.translate(cx - 12 * scale, cy - 12 * scale);
+  ctx.scale(scale, scale);
+  ctx.fillStyle = color;
+  const ellipse = (x, y, rx, ry, rot) => {
+    ctx.beginPath();
+    ctx.ellipse(x, y, rx, ry, (rot * Math.PI) / 180, 0, Math.PI * 2);
+    ctx.fill();
+  };
+  ellipse(6.4, 9.6, 1.9, 2.5, -22);
+  ellipse(10.1, 7.2, 1.9, 2.6, 0);
+  ellipse(13.9, 7.2, 1.9, 2.6, 0);
+  ellipse(17.6, 9.6, 1.9, 2.5, 22);
+  ctx.beginPath();
+  ctx.moveTo(12, 11.4);
+  ctx.bezierCurveTo(8.6, 11.4, 6.2, 14.1, 6.2, 16.7);
+  ctx.bezierCurveTo(6.2, 19.3, 8.6, 20.3, 10, 20);
+  ctx.bezierCurveTo(10.9, 19.8, 11.4, 19.4, 12, 19.4);
+  ctx.bezierCurveTo(12.6, 19.4, 13.1, 19.8, 14, 20);
+  ctx.bezierCurveTo(15.4, 20.3, 17.8, 19.3, 17.8, 16.7);
+  ctx.bezierCurveTo(17.8, 14.1, 15.4, 11.4, 12, 11.4);
+  ctx.fill();
+  ctx.restore();
+}
 
 function wrapText(ctx, text, maxWidth) {
   const words = String(text ?? '').split(/\s+/);
@@ -127,19 +154,18 @@ export async function generateFlyer(pet, { qr = null } = {}) {
   ctx.fillStyle = CORAL;
   ctx.fillRect(0, 0, W, 240);
 
-  ctx.globalAlpha = 0.45;
-  ctx.font = emojiFont(46);
-  ctx.textAlign = 'center';
-  ctx.fillText('🐾', 105, 105);
-  ctx.fillText('🐾', W - 105, 105);
+  ctx.globalAlpha = 0.4;
+  drawPaw(ctx, 100, 100, 3.6, '#FFFFFF');
+  drawPaw(ctx, W - 100, 100, 3.6, '#FFFFFF');
   ctx.globalAlpha = 1;
 
+  ctx.textAlign = 'center';
   ctx.fillStyle = '#FFFFFF';
-  ctx.font = font(116, 900);
+  ctx.font = font(112, 800);
   ctx.fillText('SE PERDIÓ', W / 2, 148);
   ctx.fillStyle = CORAL_SOFT;
-  ctx.font = font(36, 800);
-  ctx.fillText('¡Ayúdanos a volver a casa! 🙏', W / 2, 208);
+  ctx.font = font(36, 700);
+  ctx.fillText('Ayúdanos a volver a casa', W / 2, 208);
 
   // ── Nombre ──
   fitText(ctx, pet.name.toUpperCase(), W / 2, 348, 92, 900, W - 160, INK);
@@ -166,11 +192,9 @@ export async function generateFlyer(pet, { qr = null } = {}) {
     const dh = img.height * scale;
     ctx.drawImage(img, px + (photoSize - dw) / 2, py + (photoSize - dh) / 2, dw, dh);
   } else {
-    ctx.fillStyle = pet.bg ?? '#FDE2CF';
+    ctx.fillStyle = pet.bg ?? '#FFF0D3';
     ctx.fillRect(px, py, photoSize, photoSize);
-    ctx.font = emojiFont(330);
-    ctx.textAlign = 'center';
-    ctx.fillText(pet.emoji ?? '🐾', W / 2, py + photoSize / 2 + 115);
+    drawPaw(ctx, W / 2, py + photoSize / 2, 13, CORAL);
   }
   ctx.restore();
 
@@ -197,7 +221,7 @@ export async function generateFlyer(pet, { qr = null } = {}) {
 
   // ── Perdido desde ──
   if (pet.status === 'lost' && pet.lostAt) {
-    const when = `🕐 Perdid${pet.pronoun ?? 'o'} desde el ${new Date(pet.lostAt).toLocaleDateString('es-PE')} a las ${formatClock(pet.lostAt)}`;
+    const when = `Perdid${pet.pronoun ?? 'o'} desde el ${new Date(pet.lostAt).toLocaleDateString('es-PE')} a las ${formatClock(pet.lostAt)}`;
     fitText(ctx, when, W / 2, 1352, 37, 800, W - 180, CORAL);
   }
 
@@ -217,11 +241,11 @@ export async function generateFlyer(pet, { qr = null } = {}) {
 
   ctx.fillStyle = CORAL;
   ctx.textAlign = 'center';
-  ctx.font = font(43, 900);
-  ctx.fillText('¿Lo viste? ¡Llama ya!', leftCx, bandY + 76);
-  fitText(ctx, `📞 ${pet.ownerPhone || 'Contacto en la app'}`, leftCx, bandY + 152, 60, 900, qrImg ? 740 : W - 260, INK);
+  ctx.font = font(42, 800);
+  ctx.fillText('¿Lo viste? Llama ya', leftCx, bandY + 76);
+  fitText(ctx, pet.ownerPhone || 'Contacto en la app', leftCx, bandY + 152, 58, 800, qrImg ? 740 : W - 260, INK);
   ctx.fillStyle = MUTED;
-  ctx.font = font(33, 700);
+  ctx.font = font(33, 600);
   ctx.fillText(pet.ownerName ?? '', leftCx, bandY + 206);
 
   if (qrImg) {
@@ -232,17 +256,19 @@ export async function generateFlyer(pet, { qr = null } = {}) {
     ctx.stroke();
     ctx.drawImage(qrImg, 915, bandY + 28, 180, 180);
     ctx.fillStyle = INK;
-    ctx.font = font(24, 800);
-    ctx.fillText('Escanéame 📱', 1005, bandY + 228);
+    ctx.font = font(24, 700);
+    ctx.textAlign = 'center';
+    ctx.fillText('Escanéame', 1005, bandY + 228);
   }
 
   // ── Pie de marca ──
   ctx.fillStyle = CORAL;
   ctx.fillRect(0, H - 84, W, 84);
+  drawPaw(ctx, 300, H - 42, 2.1, '#FFFFFF');
   ctx.fillStyle = '#FFFFFF';
-  ctx.font = font(33, 800);
+  ctx.font = font(33, 700);
   ctx.textAlign = 'center';
-  ctx.fillText('🐾 Patrulla Patitas · La guardia ciudadana de mascotas', W / 2, H - 31);
+  ctx.fillText('Patrulla Patitas · La guardia ciudadana de mascotas', W / 2 + 24, H - 31);
 
   return canvas.toDataURL('image/png');
 }

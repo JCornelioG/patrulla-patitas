@@ -25,7 +25,7 @@ export async function scheduleReminder(reminder, petName) {
       notifications: [
         {
           id: numericId(reminder.id),
-          title: `🐾 ${reminder.title}`,
+          title: reminder.title,
           body: `Recordatorio de cuidado de ${petName}`,
           schedule,
         },

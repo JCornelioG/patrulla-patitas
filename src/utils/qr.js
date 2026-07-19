@@ -17,7 +17,7 @@ export function petVCard(pet) {
   const lines = [
     'BEGIN:VCARD',
     'VERSION:3.0',
-    `FN:Familia de ${pet.name} 🐾`,
+    `FN:Familia de ${pet.name} (Patrulla Patitas)`,
     phone ? `TEL;TYPE=CELL:${phone}` : null,
     `NOTE:¡Hola! Soy ${pet.name} (${pet.species}). Si me encontraste, llama a mi familia. ${pet.description ?? ''} (Chapita de Patrulla Patitas)`,
     'END:VCARD',
