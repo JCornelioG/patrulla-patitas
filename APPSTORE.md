@@ -111,7 +111,7 @@ El código ya está listo: app React empaquetada con Capacitor, proyecto iOS gen
    - Información de contacto (nombre, teléfono — los ingresa el usuario voluntariamente) → Funcionalidad de la app → NO vinculada → NO tracking.
    - Historial de compras (suscripción Patitas Plus vía StoreKit/RevenueCat) → Funcionalidad de la app → NO vinculada → NO tracking.
    - "¿Usas datos para tracking?" → **No**.
-4. **URL de política de privacidad**: publica `public/privacidad.html` en una URL pública. Lo más rápido: GitHub Pages del mismo repo (Settings → Pages → deploy from branch → la URL será `https://TU_USUARIO.github.io/patrulla-patitas/privacidad.html` sirviendo la carpeta `public/`… o crea un repo aparte solo con ese archivo). Netlify Drop también sirve (arrastras el archivo y listo).
+4. **URL de política de privacidad**: ✅ ya pública en **<https://patrulla-patitas.web.app/privacidad.html>** (Firebase Hosting, se actualiza con cada `firebase deploy --only hosting`).
 5. **Age rating**: 4+. Categoría: Estilo de vida (secundaria: Utilidades).
 6. **Notas para el revisor** (campo App Review Information — pega esto):
    > La app no requiere cuenta (usa autenticación anónima de Firebase). Para probarla: 1) pestaña "Mis mascotas" → "Agregar mascota" → crear un perfil, 2) pulsar "SE PERDIÓ" → se publica una alerta comunitaria con zona aproximada, 3) en la alerta, "¡LO VI AQUÍ!" permite marcar avistamientos en el mapa, 4) "¡APARECIÓ!" cierra el caso. El feed de alertas puede verse vacío si no hay mascotas perdidas reportadas cerca de la ubicación del revisor; es el estado esperado. El contenido generado por usuarios puede reportarse desde cada alerta ("Reportar contenido inapropiado").
