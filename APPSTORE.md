@@ -19,7 +19,7 @@ El código ya está listo: app React empaquetada con Capacitor, proyecto iOS gen
 | `src/config/firebase.js` | Config web de tu proyecto Firebase (paso 1) |
 | `ios/App/App/GoogleService-Info.plist` | Archivo real de Firebase iOS (paso 1); en CI lo inyecta la variable segura |
 | `codemagic.yaml` → `APP_STORE_APPLE_ID` | Apple ID numérico de tu app (paso 3) |
-| `src/config/constants.js` → `SUPPORT_EMAIL` y `public/privacidad.html` | Tu correo real de soporte |
+| `src/config/constants.js` → `SUPPORT_EMAIL` y `public/privacidad.html` | ✅ hecho: patitaspatrulla736@gmail.com |
 | `src/config/revenuecat.js` | API key de RevenueCat para cobrar Patitas Plus (paso 3.5) — sin ella el paywall corre en modo prueba |
 
 ---

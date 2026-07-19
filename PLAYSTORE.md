@@ -53,16 +53,40 @@ Este documento cubre lo que solo tú puedes hacer (cuentas y claves). Los pasos 
 ## Paso 5 — Completar la ficha (~1 h)
 
 1. **Capturas**: desde cualquier teléfono Android con la build interna instalada (o un emulador de Android Studio). Mínimo 2 de teléfono; recomendado: feed, detalle con mapa, final feliz, paywall.
-2. **Ficha**: usa los mismos textos del paso 6 de APPSTORE.md (descripción, subtítulo). Ícono 512×512 (exporta de `assets/icon.png`) y banner 1024×500 (puedo generarlo si quieres).
-3. **Data Safety** (Play Console → App content → Data safety) — declara exactamente:
+2. **Gráficos listos en el repo** (carpeta `store/`, regenerables con `node scripts/generate-store-assets.mjs`):
+   - `store/icon-512.png` → ícono de la ficha
+   - `store/feature-graphic.png` → gráfico destacado 1024×500
+3. **Textos listos para pegar**:
+   - **Nombre**: Patrulla Patitas
+   - **Descripción corta** (máx. 80): `Alerta a tus vecinos si tu mascota se pierde y sigue su rastro en el mapa.`
+   - **Descripción completa**:
+     > ¿Se perdió tu mascota? Con Patrulla Patitas no la buscas en soledad: activa la alerta y los vecinos cercanos la reciben al instante en su teléfono. Cada avistamiento se marca en el mapa y forma un rastro en tiempo real que guía a tu familia hasta ella.
+     >
+     > 🚨 UN BOTÓN, TODOS ALERTA
+     > Presiona "SE PERDIÓ" y la guardia ciudadana de tu zona recibe la alerta con la foto, las señas y la zona aproximada. El radio de búsqueda se expande automáticamente mientras no aparezca.
+     >
+     > 👀 CADA OJO SUMA
+     > ¿Viste una mascota perdida? Toca "¡Lo vi aquí!" y marca el punto en el mapa. Su rastro de avistamientos se actualiza en vivo para todos.
+     >
+     > 📄 HERRAMIENTAS DE RESCATE GRATIS
+     > Flyer de búsqueda imprimible, notificaciones de mascotas perdidas cerca de ti y final feliz para agradecer a quienes ayudaron. El rescate es y será siempre gratis.
+     >
+     > 🛡️ PRIVACIDAD PRIMERO
+     > Nunca publicamos direcciones exactas: solo zonas aproximadas. Sin registro ni contraseñas.
+     >
+     > ✨ PATITAS PLUS (opcional)
+     > Cartilla sanitaria digital, recordatorios de vacunas y cuidados, chapita QR para el collar y mascotas ilimitadas. Tu suscripción mantiene el rescate gratis para todo el barrio.
+     >
+     > Hecho con 💛 para las mascotas del Perú.
+4. **Data Safety** (Play Console → App content → Data safety) — declara exactamente:
    - **Ubicación → Aproximada**: recolectada, NO compartida, con fines de "Funcionalidad de la app". Efímera: no. Requerida: sí.
    - **Fotos**: recolectadas (fotos de mascotas), no compartidas, funcionalidad.
    - **Información personal → Nombre y teléfono**: opcionales, ingresados por el usuario, visibles en sus propias alertas, funcionalidad.
    - **Historial de compras**: recolectado (suscripción), funcionalidad.
    - Datos cifrados en tránsito: sí. Se pueden solicitar borrados: sí (correo de soporte).
-4. **Clasificación de contenido** (cuestionario IARC): app utilitaria, sin violencia/apuestas → apto para todos.
-5. **Política de privacidad**: la misma URL pública del paso iOS.
-6. Declaraciones restantes: sin anuncios; público objetivo 13+; no es app de noticias ni COVID.
+5. **Clasificación de contenido** (cuestionario IARC): app utilitaria, sin violencia/apuestas → apto para todos.
+6. **Política de privacidad**: la misma URL pública del paso iOS.
+7. Declaraciones restantes: sin anuncios; público objetivo 13+; no es app de noticias ni COVID.
 
 ## Paso 6 — Testing y producción
 

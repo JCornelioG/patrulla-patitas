@@ -8,7 +8,7 @@ export const MAX_ALERT_RADIUS_M = 2500;
 
 // Contacto para reportes de contenido inapropiado (requisito de revisión
 // de Apple para apps con contenido generado por usuarios).
-export const SUPPORT_EMAIL = 'soporte@patrullapatitas.pe';
+export const SUPPORT_EMAIL = 'patitaspatrulla736@gmail.com';
 
 // Límite de mascotas del plan gratuito (Patitas Plus: ilimitadas).
 // El rescate (alertas, mapa, avistamientos) NUNCA se limita.
