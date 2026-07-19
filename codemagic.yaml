@@ -73,7 +73,9 @@ workflows:
 
   android-playstore:
     name: Android · Build y subida a Play Console
-    instance_type: linux_x2
+    # mac_mini_m2: la instancia incluida en el plan gratuito (las Linux son
+    # de pago); Android compila sin problema en macOS.
+    instance_type: mac_mini_m2
     max_build_duration: 60
     environment:
       android_signing:
