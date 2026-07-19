@@ -105,7 +105,10 @@ workflows:
     artifacts:
       - android/app/build/outputs/**/*.aab
       - android/app/build/outputs/**/mapping.txt
-    publishing:
-      google_play:
-        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
-        track: internal # internal → closed → production a medida que avances
+    # Publicación automática a Play Console: descomentar cuando exista la
+    # cuenta de servicio (PLAYSTORE.md paso 4.3). Mientras tanto, el AAB se
+    # descarga de los artifacts del build y se sube a mano.
+    # publishing:
+    #   google_play:
+    #     credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+    #     track: internal # internal → closed → production a medida que avances
