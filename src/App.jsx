@@ -1,4 +1,4 @@
-// FUTURO: internacionalización (i18n) — los textos de la UI están en español
+// FUTURO: internacionalización (i18n). Los textos de la UI están en español
 // (Perú). Para abrir la app a otros mercados: extraer las cadenas a un
 // diccionario por idioma (ej. react-i18next), detectar el locale del
 // dispositivo y localizar también la ficha del App Store por país.
@@ -11,7 +11,9 @@ import { initSubscription } from './services/subscription';
 import { usePlus } from './hooks/usePlus';
 import { useUserLocation } from './hooks/useUserLocation';
 import { approx } from './utils/geo';
+import { hapticAlert, hapticSuccess, hapticTap } from './utils/haptics';
 import PaywallModal from './components/PaywallModal';
+import Onboarding from './components/Onboarding';
 import TabBar from './components/TabBar';
 import AlertsFeed from './components/AlertsFeed';
 import MapTab from './components/MapTab';
@@ -31,8 +33,24 @@ export default function App() {
   const [celebratingId, setCelebratingId] = useState(null);
   const [toast, setToast] = useState(null);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    try {
+      return !localStorage.getItem('pp-onboarded');
+    } catch {
+      return false;
+    }
+  });
   const { location: userLocation } = useUserLocation();
   const isPlus = usePlus();
+
+  function finishOnboarding() {
+    try {
+      localStorage.setItem('pp-onboarded', '1');
+    } catch {
+      /* sin persistencia igual seguimos */
+    }
+    setShowOnboarding(false);
+  }
 
   // Arranque: capa de datos (Firebase o demo local) + suscripción en vivo.
   useEffect(() => {
@@ -104,6 +122,7 @@ export default function App() {
   function markLost(id) {
     // Privacidad: se publica la zona aproximada (~100 m), nunca el punto exacto.
     const zone = approx(userLocation.lat, userLocation.lng);
+    hapticAlert();
     setConfirmLostId(null);
     setSelectedId(id);
     run(() => store.markLost(id, zone), '🚨 Alerta enviada a los vecinos más cercanos');
@@ -112,6 +131,7 @@ export default function App() {
   function addSighting(id, { lat, lng, note }) {
     const zone = approx(lat, lng);
     const reporterName = getProfile().name || 'Un vecino';
+    hapticTap();
     run(
       () => store.addSighting(id, { ...zone, note, reporterId: uid, reporterName }),
       '💛 ¡Gracias! Tu avistamiento ya está en el rastro',
@@ -119,6 +139,7 @@ export default function App() {
   }
 
   function markFound(id) {
+    hapticSuccess();
     setCelebratingId(id);
     run(() => store.markFound(id));
   }
@@ -139,7 +160,10 @@ export default function App() {
   if (!store) {
     return (
       <div className="app">
-        <div className="boot">🐾 Cargando la guardia…</div>
+        <div className="boot">
+          <span className="boot-paw">🐾</span>
+          Cargando la guardia…
+        </div>
       </div>
     );
   }
@@ -148,7 +172,10 @@ export default function App() {
     <div className="app">
       <header className="header">
         <div className="brand">
-          🐾 Patrulla <em>Patitas</em>
+          <span className="brand-logo">🐾</span>
+          <span>
+            Patrulla <em>Patitas</em>
+          </span>
         </div>
         <span className="tagline">La guardia ciudadana de mascotas · siempre gratis 💛</span>
       </header>
@@ -171,10 +198,12 @@ export default function App() {
             pets={enriched}
             now={now}
             isPlus={isPlus}
+            canLink={store.mode === 'firebase'}
             onOpen={setSelectedId}
             onRequestLost={setConfirmLostId}
             onAddPet={addPet}
             onOpenPaywall={() => setShowPaywall(true)}
+            onToast={setToast}
           />
         )}
       </main>
@@ -211,6 +240,8 @@ export default function App() {
       )}
 
       {celebrating && <FoundCelebration pet={celebrating} onClose={() => closeCase(celebrating.id)} />}
+
+      {showOnboarding && <Onboarding onDone={finishOnboarding} />}
 
       {toast && <div className="toast">{toast}</div>}
     </div>

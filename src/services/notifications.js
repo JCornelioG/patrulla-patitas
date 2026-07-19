@@ -2,7 +2,7 @@ import { Capacitor } from '@capacitor/core';
 
 // Notificaciones locales para los recordatorios de la cartilla.
 // Solo funcionan en la app instalada (iOS/Android); en web los recordatorios
-// se guardan igual pero no suenan — la UI lo aclara.
+// se guardan igual pero no suenan; la UI lo aclara.
 
 // Id numérico estable a partir del id de texto del recordatorio.
 function numericId(id) {

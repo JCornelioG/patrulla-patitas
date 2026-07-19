@@ -1,10 +1,21 @@
 import { useState } from 'react';
 import PetAvatar from './PetAvatar';
 import PetFormModal from './PetFormModal';
+import AccountCard from './AccountCard';
 import { FREE_PET_LIMIT } from '../config/constants';
 import { formatElapsed } from '../utils/geo';
 
-export default function MyPets({ pets, now, isPlus, onOpen, onRequestLost, onAddPet, onOpenPaywall }) {
+export default function MyPets({
+  pets,
+  now,
+  isPlus,
+  canLink,
+  onOpen,
+  onRequestLost,
+  onAddPet,
+  onOpenPaywall,
+  onToast,
+}) {
   const [adding, setAdding] = useState(false);
   const own = pets.filter((p) => p.own);
   // El plan gratis incluye FREE_PET_LIMIT mascotas; el rescate nunca se limita.
@@ -15,8 +26,10 @@ export default function MyPets({ pets, now, isPlus, onOpen, onRequestLost, onAdd
       <h2 className="section-title">Mis mascotas</h2>
       <p className="privacy-note">🔒 Tu dirección nunca se comparte: las alertas usan zonas aproximadas.</p>
 
+      {canLink && <AccountCard onToast={onToast} />}
+
       {isPlus ? (
-        <div className="card plus-active">✨ Patitas Plus activo — gracias por apoyar la guardia 💛</div>
+        <div className="card plus-active">✨ Patitas Plus activo. ¡Gracias por apoyar la guardia! 💛</div>
       ) : (
         <button className="card plus-promo" onClick={onOpenPaywall}>
           <strong>🐾 Patitas Plus</strong>

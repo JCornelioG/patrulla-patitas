@@ -11,7 +11,7 @@ export function qrDataUrl(text, size = 512) {
 }
 
 // vCard offline: cualquier persona que escanee el QR con la cámara del
-// celular ve el contacto del dueño — sin necesidad de tener la app.
+// celular ve el contacto del dueño, sin necesidad de tener la app.
 export function petVCard(pet) {
   const phone = (pet.ownerPhone ?? '').replace(/\s/g, '');
   const lines = [
@@ -19,7 +19,7 @@ export function petVCard(pet) {
     'VERSION:3.0',
     `FN:Familia de ${pet.name} 🐾`,
     phone ? `TEL;TYPE=CELL:${phone}` : null,
-    `NOTE:¡Hola! Soy ${pet.name} (${pet.species}). Si me encontraste, llama a mi familia. ${pet.description ?? ''} — Chapita de Patrulla Patitas`,
+    `NOTE:¡Hola! Soy ${pet.name} (${pet.species}). Si me encontraste, llama a mi familia. ${pet.description ?? ''} (Chapita de Patrulla Patitas)`,
     'END:VCARD',
   ];
   return lines.filter(Boolean).join('\n');

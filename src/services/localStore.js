@@ -1,7 +1,7 @@
 import { demoPets } from '../data/demoData';
 
 // Modo demo: los datos viven en localStorage del dispositivo. Mismo contrato
-// que firebaseStore, pero sin red — sirve para desarrollo y para probar la
+// que firebaseStore, pero sin red: sirve para desarrollo y para probar la
 // app antes de configurar Firebase.
 
 const KEY = 'pp-data-v1';

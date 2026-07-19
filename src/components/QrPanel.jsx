@@ -64,7 +64,7 @@ export default function QrPanel({ pet, onClose }) {
 
         <p className="muted small">
           Imprime este QR y pégalo en la chapita del collar. Quien lo escanee con la cámara del
-          celular ve tu contacto al instante — <strong>no necesita tener la app</strong>.
+          celular ve tu contacto al instante y <strong>no necesita tener la app</strong>.
         </p>
 
         {qr ? <img className="qr-img" src={qr} alt={`QR de ${pet.name}`} /> : <div className="empty">Generando QR…</div>}

@@ -62,7 +62,7 @@ export default function PaywallModal({ onClose, onPurchased }) {
         <div className="paywall-head">
           <h3>🐾 Patitas Plus</h3>
           <p className="muted small">
-            Cuida a tu mascota antes de que se pierda. El rescate — alertas, mapa y avistamientos —
+            Cuida a tu mascota antes de que se pierda. El rescate (alertas, mapa y avistamientos)
             <strong> es y será siempre gratis para todos</strong>.
           </p>
         </div>
@@ -77,7 +77,7 @@ export default function PaywallModal({ onClose, onPurchased }) {
               <span className="feat-icon">{icon}</span>
               <span>
                 <strong>{title}</strong>
-                <span className="muted small"> — {sub}</span>
+                <span className="muted small">: {sub}</span>
               </span>
             </li>
           ))}

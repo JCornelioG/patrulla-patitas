@@ -35,6 +35,11 @@ El código ya está listo: app React empaquetada con Capacitor, proyecto iOS gen
 7. **Push (APNs ↔ Firebase)** — hazlo después del paso 2:
    - En Apple Developer → Certificates, Identifiers & Profiles → **Keys** → crea una clave con "Apple Push Notifications service (APNs)" y descarga el `.p8` (guárdalo bien, solo se descarga una vez). Anota Key ID y Team ID.
    - En Firebase → Configuración del proyecto → **Cloud Messaging** → apps de Apple → sube el `.p8` con Key ID y Team ID.
+7.5 **Vinculación de cuenta (recuperar mascotas al cambiar de teléfono)** — la app ofrece "Continuar con Google/Apple" en Mis mascotas:
+   - **Google**: ✅ ya habilitado; el `GoogleService-Info.plist` con OAuth está en el repo y el `REVERSED_CLIENT_ID` registrado como URL Scheme en `Info.plist`.
+   - **Apple**: Authentication → Sign-in method → habilita **Apple** (requiere la cuenta de Apple Developer). La capability "Sign in with Apple" ya está en `App.entitlements`; actívala también en el App ID del portal de Apple (Identifiers → tu App ID → Sign in with Apple).
+   - Sin habilitarlos, los botones muestran un aviso amable y no rompen nada.
+
 8. **Reglas y Cloud Functions** (desde esta PC, requiere el plan **Blaze**: Configuración → Uso y facturación → cambiar plan):
    ```bash
    npm install -g firebase-tools

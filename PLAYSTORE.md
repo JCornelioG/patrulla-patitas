@@ -25,7 +25,8 @@ Este documento cubre lo que solo tú puedes hacer (cuentas y claves). Los pasos 
 
 1. En tu proyecto Firebase (el mismo de iOS) → **Agregar app → Android**, package name exacto: `com.patrullapatitas.app`.
 2. Descarga **google-services.json**. No hace falta tocar gradle: el proyecto ya detecta el archivo automáticamente si está en `android/app/`, y en CI se inyecta desde la variable segura.
-3. Push en Android: no requiere nada más — FCM funciona directo (sin APNs ni claves extra). Las Cloud Functions que ya escribimos notifican a iOS y Android por igual.
+3. Push en Android: no requiere nada más, FCM funciona directo (sin APNs ni claves extra). Las Cloud Functions que ya escribimos notifican a iOS y Android por igual.
+4. **"Continuar con Google" en Android** (vinculación de cuenta): en la consola de Firebase → Configuración del proyecto → tu app Android → agrega las huellas **SHA-1 y SHA-256** del keystore de firma (Codemagic las muestra en Code signing identities, o con `keytool -list -v -keystore tu.keystore`). Luego vuelve a descargar `google-services.json` y reemplaza el de `android/app/`.
 
 ## Paso 2 — Cuenta de Google Play Console (~1–2 días por verificación)
 

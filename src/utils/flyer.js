@@ -242,7 +242,7 @@ export async function generateFlyer(pet, { qr = null } = {}) {
   ctx.fillStyle = '#FFFFFF';
   ctx.font = font(33, 800);
   ctx.textAlign = 'center';
-  ctx.fillText('🐾 Patrulla Patitas — la guardia ciudadana de mascotas', W / 2, H - 31);
+  ctx.fillText('🐾 Patrulla Patitas · La guardia ciudadana de mascotas', W / 2, H - 31);
 
   return canvas.toDataURL('image/png');
 }

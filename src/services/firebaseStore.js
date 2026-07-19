@@ -1,5 +1,4 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth, signInAnonymously } from 'firebase/auth';
+import { signInAnonymously, onAuthStateChanged } from 'firebase/auth';
 import {
   getFirestore,
   collection,
@@ -12,15 +11,20 @@ import {
   arrayUnion,
 } from 'firebase/firestore';
 import { getStorage, ref, uploadString, getDownloadURL } from 'firebase/storage';
-import { firebaseConfig } from '../config/firebase';
+import { firebaseApp, firebaseAuth } from './firebaseApp';
 
 // Capa de datos de producción: Firestore (datos en tiempo real), Storage
-// (fotos) y Auth anónima (identidad sin registro — no pedimos cuentas).
+// (fotos) y Auth anónima (identidad sin registro, no pedimos cuentas).
 // La seguridad la imponen firestore.rules / storage.rules (raíz del repo).
+//
+// FUTURO: la identidad anónima vive en el dispositivo. Si el usuario borra
+// los datos de la app o la reinstala, pierde acceso a sus mascotas (quedan
+// huérfanas). v1.1: vincular la cuenta anónima con "Iniciar con Apple/Google"
+// (linkWithCredential) para poder recuperarla en otro dispositivo.
 
 export function createFirebaseStore() {
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+  const app = firebaseApp();
+  const auth = firebaseAuth();
   const db = getFirestore(app);
   const storage = getStorage(app);
   let uid = null;
@@ -32,6 +36,19 @@ export function createFirebaseStore() {
     },
 
     async init() {
+      // Esperar a que Auth restaure la sesión guardada antes de decidir:
+      // si el usuario ya tiene identidad (anónima o vinculada a Apple/Google),
+      // se reusa; solo se crea una anónima nueva si no hay ninguna.
+      const existing = await new Promise((resolve) => {
+        const unsub = onAuthStateChanged(auth, (user) => {
+          unsub();
+          resolve(user);
+        });
+      });
+      if (existing) {
+        uid = existing.uid;
+        return;
+      }
       const cred = await signInAnonymously(auth);
       uid = cred.user.uid;
     },

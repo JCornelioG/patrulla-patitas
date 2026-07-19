@@ -65,7 +65,7 @@ export default function HealthPanel({ pet, initialTab = 'registros', onClose }) 
         <div className="detail-hero" style={{ marginBottom: 6 }}>
           <PetAvatar pet={pet} size={56} />
           <p className="muted small" style={{ margin: 0 }}>
-            {tab === 'registros' && 'Vacunas, tratamientos y consultas — el historial completo de salud.'}
+            {tab === 'registros' && 'Vacunas, tratamientos y consultas: el historial completo de salud.'}
             {tab === 'peso' && 'Registra el peso en cada control para seguir su evolución.'}
             {tab === 'recordatorios' && 'Nunca más una vacuna vencida: te avisamos a tiempo.'}
           </p>
@@ -83,7 +83,7 @@ export default function HealthPanel({ pet, initialTab = 'registros', onClose }) 
                   <strong>{r.name}</strong> · <span className="muted small">{r.type}</span>
                   <p style={{ margin: '2px 0' }} className="small">
                     {formatDate(r.date)}
-                    {r.notes ? ` — ${r.notes}` : ''}
+                    {r.notes ? ` · ${r.notes}` : ''}
                   </p>
                 </div>
                 <button className="row-del" onClick={() => remove('records', r.id)} aria-label="Eliminar">

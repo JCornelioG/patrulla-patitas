@@ -97,7 +97,7 @@ export default function AlertMap({
                 >
                   {!onPetClick && (
                     <Popup>
-                      <strong>{pet.name}</strong> — visto por última vez en esta zona (aproximada)
+                      <strong>{pet.name}</strong>: visto por última vez en esta zona (aproximada)
                     </Popup>
                   )}
                 </Marker>

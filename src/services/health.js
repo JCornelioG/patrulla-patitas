@@ -1,7 +1,7 @@
 // Cartilla sanitaria y recordatorios (Patitas Plus).
 //
 // v1: los datos viven en el dispositivo (localStorage), en ambos modos
-// (demo y Firebase) — la cartilla es información sensible y NO se publica.
+// (demo y Firebase): la cartilla es información sensible y NO se publica.
 // FUTURO (Plus "respaldo en la nube"): sincronizar en una subcolección
 // privada pets/{id}/private/cartilla con reglas de solo-dueño.
 

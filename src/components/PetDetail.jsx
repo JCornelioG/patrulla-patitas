@@ -205,7 +205,7 @@ export default function PetDetail({
           </p>
         )}
 
-        {/* FUTURO: chapita QR — quien escanee el collar llega a este perfil. */}
+        {/* FUTURO: chapita QR. Quien escanee el collar llega a este perfil. */}
       </div>
 
       {pending && (

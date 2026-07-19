@@ -16,7 +16,7 @@ export default function AlertsFeed({ pets, now, userLocation, onOpen }) {
       {sorted.map((pet) => {
         const trail = [...pet.sightings].sort((a, b) => a.at - b.at);
         const lastSeen = trail[trail.length - 1] ?? pet.lastKnown;
-        const dist = lastSeen ? formatDistance(distanceM(userLocation, lastSeen)) : '—';
+        const dist = lastSeen ? formatDistance(distanceM(userLocation, lastSeen)) : '...';
         const n = pet.sightings.length;
         return (
           <button className="card alert-card" key={pet.id} onClick={() => onOpen(pet.id)}>
