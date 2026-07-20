@@ -10,6 +10,7 @@ App de **guardia ciudadana de mascotas perdidas**: cuando se pierde una mascota,
 - **Backend**: Firebase — Firestore (tiempo real), Storage (fotos), Auth anónima (sin cuentas) y Cloud Messaging (push). Sin configurar Firebase, la app corre en **modo demo** con datos locales de ejemplo.
 - **Patitas Plus** (suscripción vía Apple IAP + RevenueCat): cartilla sanitaria, recordatorios con notificaciones, chapita QR para el collar, flyer con QR y mascotas ilimitadas. Sin API key de RevenueCat, el paywall corre en **modo prueba** (compra simulada en el dispositivo). El rescate — alertas, mapa, avistamientos y flyer básico — es siempre gratis.
 - **Publicación sin Mac** vía CI de Codemagic. Guías paso a paso: **[APPSTORE.md](APPSTORE.md)** (iOS) y **[PLAYSTORE.md](PLAYSTORE.md)** (Android).
+- **¿Retomas el proyecto (o cambias de asistente/desarrollador)?** Empieza por **[HANDOFF.md](HANDOFF.md)**: arquitectura, cuentas, estado y pasos pendientes en un solo lugar.
 
 ## Correr en desarrollo
 
