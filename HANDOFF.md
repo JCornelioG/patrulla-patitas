@@ -155,8 +155,10 @@ se hacen en la nube con Codemagic (no requieren Mac).
    > es gratis, nunca se publican direcciones exactas, y no se usan emojis como
    > iconografía. Actúa como Senior Frontend/Mobile Engineer y ayúdame con: [tu tarea].
 
-3. Apúntalo siempre a `HANDOFF.md`, `README.md`, `APPSTORE.md` y `PLAYSTORE.md`:
-   son la fuente de verdad del proyecto, independiente de cualquier chat.
+3. Apúntalo siempre a `HANDOFF.md`, `BITACORA.md`, `README.md`, `APPSTORE.md` y
+   `PLAYSTORE.md`: son la fuente de verdad del proyecto, independiente de cualquier
+   chat. (`BITACORA.md` explica el *porqué* de cada decisión; este archivo, el
+   *qué* y el *dónde*.)
 
 **Lo esencial:** el proyecto es portable por diseño. Nada depende de un asistente
 concreto. Mantén este archivo actualizado cuando cambien cuentas, keys o el estado,
