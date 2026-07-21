@@ -73,6 +73,8 @@ src/
                        AlertMap, MapTab, MyPets, PetDetail, PetFormModal, Paywall,
                        HealthPanel, QrPanel, FlyerModal, Onboarding, AccountCard…
   data/demoData.js     Datos de ejemplo (solo modo demo)
+  services/places.js   Lugares de servicio (vet/albergue/etc.) desde OSM Overpass
+  components/ServicesMap.jsx  Capa "Servicios" del mapa (toggle en MapTab)
 functions/index.js     Cloud Function notificarCambios: push a vecinos y al dueño
 firestore.rules        Seguridad Firestore    storage.rules  Seguridad Storage
 ios/  android/         Proyectos nativos generados por Capacitor

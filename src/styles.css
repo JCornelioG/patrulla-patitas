@@ -472,6 +472,62 @@ main {
   position: relative;
 }
 
+/* Toggle segmentado Alertas / Servicios */
+.seg-toggle {
+  display: flex;
+  gap: 4px;
+  margin: var(--space-3) var(--space-4) 0;
+  padding: 4px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  flex-shrink: 0;
+}
+
+.seg {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 40px;
+  border: none;
+  border-radius: 9px;
+  background: none;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--color-muted);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.seg.active {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+/* Marcador de lugar de servicio (mapa de Servicios) */
+.pin-place {
+  width: 34px;
+  height: 34px;
+  border-radius: 50% 50% 50% 2px;
+  transform: rotate(45deg);
+  border: 2px solid var(--color-surface);
+  box-shadow: 0 2px 8px rgba(38, 33, 41, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pin-place svg {
+  transform: rotate(-45deg);
+}
+
+.pin-place.active {
+  transform: rotate(45deg) scale(1.15);
+  z-index: 500;
+}
+
 .maptab-chips {
   display: flex;
   gap: var(--space-2);

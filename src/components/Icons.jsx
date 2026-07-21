@@ -142,6 +142,36 @@ const STROKE_PATHS = {
       <path d="M9 12h6" />
     </>
   ),
+  vet: (
+    <>
+      <path d="M11 2h2a1 1 0 0 1 1 1v2h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-2H7a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h2V3a1 1 0 0 1 1-1Z" />
+      <path d="M8 15c-2 1-3 3-3 5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2c0-2-1-4-3-5" />
+    </>
+  ),
+  scissors: (
+    <>
+      <circle cx="6" cy="6" r="3" />
+      <circle cx="6" cy="18" r="3" />
+      <path d="M20 4 8.12 15.88" />
+      <path d="M14.47 14.48 20 20" />
+      <path d="M8.12 8.12 12 12" />
+    </>
+  ),
+  bag: (
+    <>
+      <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+      <path d="M3 6h18" />
+      <path d="M16 10a4 4 0 0 1-8 0" />
+    </>
+  ),
+  navigation: <path d="M3 11 22 2l-9 19-2-8-8-2Z" />,
+  layers: (
+    <>
+      <path d="m12 2 9 5-9 5-9-5 9-5Z" />
+      <path d="m3 12 9 5 9-5" />
+      <path d="m3 17 9 5 9-5" />
+    </>
+  ),
   pill: (
     <>
       <rect x="3.5" y="8.5" width="17" height="7" rx="3.5" transform="rotate(-30 12 12)" />

@@ -71,6 +71,20 @@ el razonamiento detrás, que es lo que no se deduce leyendo solo el código.
 
 ---
 
+### Fase 10 — Mapa de servicios (v1.1)
+- Se agregó una segunda capa a la pestaña Mapa (toggle "Alertas / Servicios")
+  con lugares de servicio para mascotas: veterinarias, albergues, guarderías,
+  pet shops y peluquerías.
+- **Fuente de datos:** OpenStreetMap vía la **Overpass API** (gratis, sin API key),
+  coherente con los tiles de OSM ya usados. Consulta por zona con caché de 7 días.
+- Cada lugar: nombre, categoría, distancia, "Llamar" (si OSM tiene teléfono) y
+  "Cómo llegar" (deep link a Google Maps). Verificado con ~80 lugares reales en Lima.
+- **Encuadre de producto:** no es un directorio genérico (eso lo hace Google Maps);
+  se ata a la misión (¿a dónde llevo un animal encontrado/herido?). Los albergues
+  conectan con el flujo de "vi una mascota perdida".
+- Limitación conocida: cobertura OSM irregular fuera de veterinarias → la capa
+  comunitaria (que los usuarios agreguen lugares) es la fase 2.
+
 ## Decisiones de fondo (el "por qué")
 
 - **¿Por qué Capacitor y no React Native?** Reutiliza el mismo código web para las
@@ -94,7 +108,14 @@ el razonamiento detrás, que es lo que no se deduce leyendo solo el código.
 
 - Chapita QR física grabada con envío (bien físico → se cobra fuera del IAP).
 - Reputación e insignias para vecinos que ayudan seguido.
-- Veterinarias asociadas que reciben alertas de su zona.
+- Veterinarias asociadas que reciben alertas de su zona (tier B2B: insignia
+  verificada + alertas de mascotas perdidas cercanas + destacado). El mapa de
+  servicios de la Fase 10 es la base sobre la que se construye.
+- Capa comunitaria del mapa de servicios: que los usuarios agreguen/reporten
+  lugares (Firestore + moderación), para cubrir lo que falta en OpenStreetMap.
+- Filtro "abierto ahora" en el mapa de servicios: requiere un parser de
+  `opening_hours` de OSM (librería dedicada). Se pospuso para no mostrar horarios
+  incorrectos en un contexto de emergencia; por ahora se muestra el horario tal cual.
 - Agrupación de marcadores (clustering) en el mapa: hoy la densidad de alertas no
   lo justifica; agregaría una dependencia sin beneficio visible.
 - Internacionalización (i18n): la app está solo en español peruano.
