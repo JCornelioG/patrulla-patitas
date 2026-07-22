@@ -38,12 +38,6 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <!-- Notificaciones push y recordatorios (requerido desde Android 13) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <!-- Foto de perfil de la mascota desde la galería -->
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    <uses-permission
-        android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32" />
-
     <!-- El GPS es útil pero no obligatorio: la app funciona con ubicación aproximada -->
     <uses-feature android:name="android.hardware.location.gps" android:required="false" />
 </manifest>

@@ -24,6 +24,10 @@ el razonamiento detrás, que es lo que no se deduce leyendo solo el código.
   dibujarla en canvas. Esto evita que el WebView la bloquee por CORS y muestre
   la huella de respaldo. La petición conserva la URL ya codificada de Firebase
   Storage (`%2F`); recodificarla apuntaba a un objeto inexistente.
+- Se retiraron `READ_MEDIA_IMAGES` y `READ_EXTERNAL_STORAGE`: la app solo pide
+  una foto puntual de la mascota y Capacitor usa el selector de fotos del
+  sistema, que no necesita acceso amplio a la galería. Esto evita una
+  declaración de permisos que no corresponde al caso de uso.
 - Google Sign-In quedó configurado con la SHA-1/SHA-256 de la clave con la que
   Google Play firma la aplicación. El nuevo `google-services.json` contiene el
   cliente OAuth Android y el cliente web requerido para emitir el token; queda

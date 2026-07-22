@@ -87,6 +87,10 @@ Este documento cubre lo que solo tú puedes hacer (cuentas y claves). Los pasos 
 5. **Clasificación de contenido** (cuestionario IARC): app utilitaria, sin violencia/apuestas → apto para todos.
 6. **Política de privacidad**: la misma URL pública del paso iOS.
 7. Declaraciones restantes: sin anuncios; público objetivo 13+; no es app de noticias ni COVID.
+8. **Fotos y videos**: la app usa el selector de fotos del sistema para que el
+   usuario elija una imagen puntual de su mascota. No declarar acceso amplio a
+   la galería; el manifiesto no solicita `READ_MEDIA_IMAGES` ni
+   `READ_EXTERNAL_STORAGE`.
 
 ## Paso 6 — Testing y producción
 
