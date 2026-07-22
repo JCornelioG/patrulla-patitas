@@ -87,7 +87,14 @@ async function loadImage(src) {
   // la capa HTTP de Capacitor y la convertimos a data URL antes de dibujarla.
   if (Capacitor.isNativePlatform() && /^https?:/i.test(src)) {
     try {
-      const response = await CapacitorHttp.get({ url: src, responseType: 'blob' });
+      const response = await CapacitorHttp.get({
+        url: src,
+        responseType: 'blob',
+        // Las URLs de Firebase Storage ya traen la ruta codificada (%2F).
+        // Si Capacitor vuelve a codificarla, pide un objeto inexistente y la
+        // foto termina reemplazada silenciosamente por la huella de respaldo.
+        shouldEncodeUrlParams: false,
+      });
       if (response.status >= 200 && response.status < 300 && typeof response.data === 'string') {
         const contentTypeEntry = Object.entries(response.headers ?? {}).find(
           ([key]) => key.toLowerCase() === 'content-type',

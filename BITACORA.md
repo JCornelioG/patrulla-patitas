@@ -22,7 +22,8 @@ el razonamiento detrás, que es lo que no se deduce leyendo solo el código.
   el marcador, pero podía conservar el encuadre inicial.
 - En Android, el flyer descarga la foto mediante la capa HTTP nativa antes de
   dibujarla en canvas. Esto evita que el WebView la bloquee por CORS y muestre
-  la huella de respaldo.
+  la huella de respaldo. La petición conserva la URL ya codificada de Firebase
+  Storage (`%2F`); recodificarla apuntaba a un objeto inexistente.
 - Google Sign-In quedó configurado con la SHA-1/SHA-256 de la clave con la que
   Google Play firma la aplicación. El nuevo `google-services.json` contiene el
   cliente OAuth Android y el cliente web requerido para emitir el token; queda
