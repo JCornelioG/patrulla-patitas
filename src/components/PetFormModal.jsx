@@ -5,64 +5,92 @@ import { pickPhoto } from '../utils/photo';
 
 // Colores suaves para el avatar cuando no hay foto (por especie).
 const BG_BY_SPECIES = { Perro: '#FFF0D3', Gato: '#EAF2FF', Otro: '#DFF5E8' };
+const normalizeSpecies = (value) => ({ Perra: 'Perro', Gata: 'Gato' })[value] ?? value;
+const normalizeSize = (value) =>
+  ({ Pequeña: 'Pequeño', Mediana: 'Mediano', Grande: 'Grande' })[value] ?? value;
 
-export default function PetFormModal({ onCancel, onSave }) {
+export default function PetFormModal({ pet = null, onCancel, onSave }) {
   const profile = getProfile();
+  const editing = Boolean(pet);
   const [form, setForm] = useState({
-    name: '',
-    species: 'Perro',
-    pronoun: 'o',
-    breed: '',
-    color: '',
-    size: 'Mediano',
-    description: '',
-    ownerName: profile.name ?? '',
-    ownerPhone: profile.phone ?? '',
+    name: pet?.name ?? '',
+    species: normalizeSpecies(pet?.species) ?? 'Perro',
+    pronoun: pet?.pronoun ?? 'o',
+    breed: pet?.breed ?? '',
+    color: pet?.color ?? '',
+    size: normalizeSize(pet?.size) ?? 'Mediano',
+    description: pet?.description ?? '',
+    ownerName: pet?.ownerName ?? profile.name ?? '',
+    ownerPhone: pet?.ownerPhone ?? profile.phone ?? '',
   });
-  const [photo, setPhoto] = useState(null); // dataURL comprimido
+  const [photo, setPhoto] = useState(null); // nueva foto como dataURL comprimido
+  const [removeExistingPhoto, setRemoveExistingPhoto] = useState(false);
   const [saving, setSaving] = useState(false);
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+  const photoPreview = photo ?? (!removeExistingPhoto ? pet?.photoUrl : null);
 
   async function choosePhoto() {
     try {
       const dataUrl = await pickPhoto();
-      if (dataUrl) setPhoto(dataUrl);
+      if (dataUrl) {
+        setPhoto(dataUrl);
+        setRemoveExistingPhoto(false);
+      }
     } catch (err) {
       console.warn('No se pudo elegir la foto:', err);
     }
   }
 
-  function save() {
+  async function save() {
     if (!form.name.trim() || saving) return;
     setSaving(true);
     saveProfile({ name: form.ownerName.trim(), phone: form.ownerPhone.trim() });
-    onSave({
-      name: form.name.trim(),
-      species: form.species,
-      pronoun: form.pronoun,
-      breed: form.breed.trim() || 'Mestizo',
-      color: form.color.trim() || 'Sin especificar',
-      size: form.size,
-      description: form.description.trim() || 'Sin descripción todavía.',
-      bg: BG_BY_SPECIES[form.species] ?? BG_BY_SPECIES.Otro,
-      photoDataUrl: photo,
-      ownerName: form.ownerName.trim() || 'Vecino de la guardia',
-      ownerPhone: form.ownerPhone.trim(),
-    });
+    try {
+      const saved = await onSave({
+        name: form.name.trim(),
+        species: form.species,
+        pronoun: form.pronoun,
+        breed: form.breed.trim() || 'Mestizo',
+        color: form.color.trim() || 'Sin especificar',
+        size: form.size,
+        description: form.description.trim() || 'Sin descripción todavía.',
+        bg: BG_BY_SPECIES[form.species] ?? BG_BY_SPECIES.Otro,
+        photoDataUrl: photo,
+        removePhoto: removeExistingPhoto,
+        ownerName: form.ownerName.trim() || 'Vecino de la guardia',
+        ownerPhone: form.ownerPhone.trim(),
+      });
+      if (saved === false) setSaving(false);
+    } catch (err) {
+      console.error(err);
+      setSaving(false);
+    }
   }
 
   return (
     <div className="overlay" onClick={onCancel}>
-      <div className="modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Nueva mascota">
+      <div
+        className="modal"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-label={editing ? 'Editar mascota' : 'Nueva mascota'}
+      >
         <div className="sheet-grip" />
-        <h3>Nueva mascota</h3>
+        <h3>{editing ? 'Editar mascota' : 'Nueva mascota'}</h3>
 
         <div className="field">
           <span className="label">Foto</span>
-          {photo ? (
+          {photoPreview ? (
             <div className="photo-row">
-              <img className="photo-preview" src={photo} alt="Foto elegida" />
-              <button type="button" className="btn btn-secondary" onClick={() => setPhoto(null)}>
+              <img className="photo-preview" src={photoPreview} alt={`Foto de ${form.name || 'la mascota'}`} />
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => {
+                  setPhoto(null);
+                  setRemoveExistingPhoto(true);
+                }}
+              >
                 Quitar
               </button>
             </div>
@@ -170,7 +198,7 @@ export default function PetFormModal({ onCancel, onSave }) {
             Cancelar
           </button>
           <button className="btn btn-primary" onClick={save} disabled={!form.name.trim() || saving}>
-            {saving ? 'Guardando…' : 'Guardar'}
+            {saving ? 'Guardando…' : editing ? 'Guardar cambios' : 'Guardar'}
           </button>
         </div>
       </div>

@@ -5,6 +5,7 @@ import SightingModal from './SightingModal';
 import HealthPanel from './HealthPanel';
 import QrPanel from './QrPanel';
 import FlyerModal from './FlyerModal';
+import PetFormModal from './PetFormModal';
 import Icon from './Icons';
 import { SUPPORT_EMAIL } from '../config/constants';
 import { alertRadius, neighborsAlerted, formatDistance, formatElapsed, formatClock } from '../utils/geo';
@@ -20,12 +21,17 @@ export default function PetDetail({
   onAddSighting,
   onRequestLost,
   onMarkFound,
+  onUpdatePet,
+  onDeletePet,
   onOpenPaywall,
 }) {
   const [placing, setPlacing] = useState(initialPlacing && pet.status === 'lost');
   const [pending, setPending] = useState(null); // punto elegido en el mapa
   const [panel, setPanel] = useState(null); // {type:'salud',tab} | {type:'qr'}
   const [showFlyer, setShowFlyer] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const lost = pet.status === 'lost';
   const elapsed = lost ? now - pet.lostAt : 0;
@@ -189,6 +195,20 @@ export default function PetDetail({
         )}
 
         {pet.own && (
+          <section className="pet-management">
+            <h3>Administrar mascota</h3>
+            <button className="btn btn-secondary btn-big" onClick={() => setEditing(true)}>
+              <Icon name="edit" size={17} />
+              Editar información
+            </button>
+            <button className="btn btn-danger-ghost btn-big" onClick={() => setConfirmDelete(true)}>
+              <Icon name="trash" size={17} />
+              Eliminar mascota
+            </button>
+          </section>
+        )}
+
+        {pet.own && (
           <section className="care">
             <h3>
               Cuidados
@@ -267,6 +287,58 @@ export default function PetDetail({
           onOpenPaywall={onOpenPaywall}
           onClose={() => setShowFlyer(false)}
         />
+      )}
+      {editing && (
+        <PetFormModal
+          pet={pet}
+          onCancel={() => setEditing(false)}
+          onSave={async (data) => {
+            const saved = await onUpdatePet(pet.id, data);
+            if (saved) setEditing(false);
+            return saved;
+          }}
+        />
+      )}
+      {confirmDelete && (
+        <div className="overlay" onClick={() => !deleting && setConfirmDelete(false)}>
+          <div
+            className="modal confirm-modal"
+            onClick={(event) => event.stopPropagation()}
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="delete-pet-title"
+          >
+            <div className="sheet-grip" />
+            <span className="confirm-icon danger">
+              <Icon name="trash" size={24} />
+            </span>
+            <h3 id="delete-pet-title">¿Eliminar a {pet.name}?</h3>
+            <p>
+              Esta acción elimina su perfil, foto y datos guardados, y no se puede deshacer.
+              {lost && ' Su alerta activa también dejará de mostrarse a la comunidad.'}
+            </p>
+            <div className="modal-actions">
+              <button
+                className="btn btn-secondary"
+                onClick={() => setConfirmDelete(false)}
+                disabled={deleting}
+              >
+                Cancelar
+              </button>
+              <button
+                className="btn btn-danger"
+                disabled={deleting}
+                onClick={async () => {
+                  setDeleting(true);
+                  const deleted = await onDeletePet(pet);
+                  if (!deleted) setDeleting(false);
+                }}
+              >
+                {deleting ? 'Eliminando…' : 'Sí, eliminar'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

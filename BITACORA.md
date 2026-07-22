@@ -11,6 +11,18 @@ el razonamiento detrás, que es lo que no se deduce leyendo solo el código.
 
 ## Línea de tiempo
 
+### Fase 12 — Gestión del perfil de mascotas antes de la prueba cerrada
+- El dueño puede editar todos los datos de su mascota desde el perfil, incluida
+  la fotografía: conservarla, reemplazarla o retirarla.
+- El dueño puede eliminar una mascota mediante un diálogo de confirmación. Si
+  tiene una alerta activa, el diálogo advierte que también dejará de mostrarse
+  a la comunidad.
+- La eliminación borra el documento de Firestore y limpia la fotografía de
+  Storage. Las reglas de Storage separan ahora la eliminación de la validación
+  de tamaño y tipo MIME usada al subir imágenes.
+- El mismo flujo funciona en el modo local de desarrollo y normaliza registros
+  antiguos que guardaban especie o tamaño en femenino.
+
 ### Fase 11 — Correcciones de la primera prueba interna Android
 - Se corrigió la jerarquía visual entre la tarjeta flotante del mapa y la
   pantalla de detalle. La tarjeta ya no atraviesa el detalle ni tapa el campo

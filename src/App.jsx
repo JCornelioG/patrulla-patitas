@@ -118,9 +118,11 @@ export default function App() {
     try {
       await action();
       if (okMsg) setToast(okMsg);
+      return true;
     } catch (err) {
       console.error(err);
       setToast('No se pudo completar. Revisa tu conexión.');
+      return false;
     }
   }
 
@@ -174,11 +176,41 @@ export default function App() {
     run(() => store.closeCase(id));
   }
 
-  function addPet({ photoDataUrl, ...data }) {
-    run(async () => {
+  function addPet({ photoDataUrl, removePhoto: _removePhoto, ...data }) {
+    return run(async () => {
       const photoUrl = photoDataUrl ? await store.uploadPhoto(photoDataUrl) : null;
       await store.addPet({ ...data, photoUrl });
     }, `${data.name} ya tiene su perfil en la guardia.`);
+  }
+
+  function updatePet(id, { photoDataUrl, removePhoto, ...data }) {
+    const current = pets.find((pet) => pet.id === id);
+    return run(async () => {
+      let photoUrl = current?.photoUrl ?? null;
+      if (photoDataUrl) {
+        photoUrl = await store.uploadPhoto(photoDataUrl);
+      } else if (removePhoto) {
+        photoUrl = null;
+      }
+
+      await store.updatePet(id, { ...data, photoUrl });
+
+      if ((photoDataUrl || removePhoto) && current?.photoUrl) {
+        await store.deletePhoto(current.photoUrl);
+      }
+    }, `Actualizamos el perfil de ${data.name}.`);
+  }
+
+  async function deletePet(pet) {
+    const deleted = await run(
+      () => store.deletePet(pet.id, pet.photoUrl),
+      `${pet.name} fue eliminado de tus mascotas.`,
+    );
+    if (deleted) {
+      setSelectedId(null);
+      setAutoPlace(false);
+    }
+    return deleted;
   }
 
   // Flujos de la acción principal "Reportar".
@@ -272,6 +304,8 @@ export default function App() {
           onAddSighting={addSighting}
           onRequestLost={setConfirmLostId}
           onMarkFound={markFound}
+          onUpdatePet={updatePet}
+          onDeletePet={deletePet}
           onOpenPaywall={() => setShowPaywall(true)}
         />
       )}

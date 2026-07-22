@@ -70,6 +70,17 @@ export function createLocalStore() {
       persist();
     },
 
+    async updatePet(id, data) {
+      update(id, { ...data, updatedAt: Date.now() });
+    },
+
+    async deletePet(id) {
+      pets = pets.filter((pet) => pet.id !== id);
+      persist();
+    },
+
+    async deletePhoto() {},
+
     async markLost(id, zone) {
       update(id, { status: 'lost', lostAt: Date.now(), foundAt: null, lastKnown: zone, sightings: [] });
     },

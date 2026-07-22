@@ -8,10 +8,14 @@ service firebase.storage {
       // Las fotos son públicas (aparecen en alertas comunitarias),
       // pero solo el dueño puede subirlas, con límite de 2 MB e imagen.
       allow read: if true;
-      allow write: if request.auth != null
+      allow create, update: if request.auth != null
         && request.auth.uid == userId
         && request.resource.size < 2 * 1024 * 1024
         && request.resource.contentType.matches('image/.*');
+
+      // Borrar una mascota también limpia su fotografía. En una eliminación
+      // request.resource no existe, por eso esta regla debe estar separada.
+      allow delete: if request.auth != null && request.auth.uid == userId;
     }
   }
 }

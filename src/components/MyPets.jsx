@@ -161,9 +161,10 @@ export default function MyPets({
       {adding && (
         <PetFormModal
           onCancel={() => setAdding(false)}
-          onSave={(data) => {
-            onAddPet(data);
-            setAdding(false);
+          onSave={async (data) => {
+            const saved = await onAddPet(data);
+            if (saved) setAdding(false);
+            return saved;
           }}
         />
       )}

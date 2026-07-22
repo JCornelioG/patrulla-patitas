@@ -210,6 +210,17 @@ main {
   color: #fff;
 }
 
+.btn-danger {
+  background: var(--color-danger-text);
+  color: #fff;
+}
+
+.btn-danger-ghost {
+  background: var(--color-danger-soft);
+  border: 1px solid transparent;
+  color: var(--color-danger-text);
+}
+
 .btn-secondary {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -1324,6 +1335,44 @@ main {
   position: absolute;
   top: 6px;
   right: 8px;
+  color: var(--color-muted);
+}
+
+.pet-management {
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.pet-management h3 {
+  margin: 0 0 var(--space-2);
+}
+
+.confirm-modal {
+  text-align: center;
+}
+
+.confirm-modal .confirm-icon {
+  width: 52px;
+  height: 52px;
+  margin: var(--space-2) auto var(--space-3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.confirm-modal .confirm-icon.danger {
+  background: var(--color-danger-soft);
+  color: var(--color-danger-text);
+}
+
+.confirm-modal h3 {
+  margin-bottom: var(--space-2);
+}
+
+.confirm-modal p {
+  margin: 0;
   color: var(--color-muted);
 }
 

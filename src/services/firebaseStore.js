@@ -8,9 +8,10 @@ import {
   onSnapshot,
   setDoc,
   updateDoc,
+  deleteDoc,
   arrayUnion,
 } from 'firebase/firestore';
-import { getStorage, ref, uploadString, getDownloadURL } from 'firebase/storage';
+import { getStorage, ref, uploadString, getDownloadURL, deleteObject } from 'firebase/storage';
 import { firebaseApp, firebaseAuth } from './firebaseApp';
 
 // Capa de datos de producción: Firestore (datos en tiempo real), Storage
@@ -94,6 +95,38 @@ export function createFirebaseStore() {
         createdAt: Date.now(),
         ...data,
       });
+    },
+
+    async updatePet(id, data) {
+      await updateDoc(doc(db, 'pets', id), {
+        ...data,
+        updatedAt: Date.now(),
+      });
+    },
+
+    async deletePet(id, photoUrl) {
+      await deleteDoc(doc(db, 'pets', id));
+      if (!photoUrl) return;
+      try {
+        await deleteObject(ref(storage, photoUrl));
+      } catch (err) {
+        // El perfil ya se eliminó correctamente. Una foto antigua u
+        // huérfana no debe hacer que la mascota reaparezca en la interfaz.
+        if (err?.code !== 'storage/object-not-found') {
+          console.warn('No se pudo eliminar la foto de la mascota:', err);
+        }
+      }
+    },
+
+    async deletePhoto(photoUrl) {
+      if (!photoUrl) return;
+      try {
+        await deleteObject(ref(storage, photoUrl));
+      } catch (err) {
+        if (err?.code !== 'storage/object-not-found') {
+          console.warn('No se pudo eliminar la foto anterior:', err);
+        }
+      }
     },
 
     async markLost(id, zone) {
