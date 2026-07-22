@@ -12,7 +12,20 @@
           "package_name": "com.patrullapatitas.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "987047171459-il3c49voh53mvu1e2gc17gvc7vq20ams.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.patrullapatitas.app",
+            "certificate_hash": "d0f138f099881f8ffeba0a53792a8ad25c2ac3e8"
+          }
+        },
+        {
+          "client_id": "987047171459-7a632pr2q1390q7srdu3li7v0sj8bb17.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAlN9qLuHLQmQl2rVdOD5RNXTZE2KQaYfs"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "987047171459-7a632pr2q1390q7srdu3li7v0sj8bb17.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "987047171459-pe0jjsciibfhvc91d8ro2lepkjp6q252.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.patrullapatitas.app"
+              }
+            }
+          ]
         }
       }
     }

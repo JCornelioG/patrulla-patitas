@@ -11,6 +11,23 @@ el razonamiento detrás, que es lo que no se deduce leyendo solo el código.
 
 ## Línea de tiempo
 
+### Fase 11 — Correcciones de la primera prueba interna Android
+- Se corrigió la jerarquía visual entre la tarjeta flotante del mapa y la
+  pantalla de detalle. La tarjeta ya no atraviesa el detalle ni tapa el campo
+  de nota al reportar un avistamiento con el teclado abierto.
+- El punto privado del usuario solicita ahora GPS de alta precisión, descarta
+  lecturas antiguas y muestra el radio de precisión. El redondeo a ~100 m se
+  mantiene únicamente al publicar alertas y avistamientos.
+- El mapa se recentra cuando llega la lectura GPS asíncrona; antes actualizaba
+  el marcador, pero podía conservar el encuadre inicial.
+- En Android, el flyer descarga la foto mediante la capa HTTP nativa antes de
+  dibujarla en canvas. Esto evita que el WebView la bloquee por CORS y muestre
+  la huella de respaldo.
+- Google Sign-In quedó configurado con la SHA-1/SHA-256 de la clave con la que
+  Google Play firma la aplicación. El nuevo `google-services.json` contiene el
+  cliente OAuth Android y el cliente web requerido para emitir el token; queda
+  comprobar el flujo en el próximo AAB de prueba interna.
+
 ### Fase 1 — Prototipo jugable
 - Se construyó la app como web React + Vite + Leaflet con datos en memoria.
 - MVP completo: perfil de mascota, botón PERDIDO con cronómetro, feed + mapa de

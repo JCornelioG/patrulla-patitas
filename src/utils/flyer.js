@@ -1,4 +1,5 @@
 import { formatClock } from './geo';
+import { Capacitor, CapacitorHttp } from '@capacitor/core';
 
 // Flyer de búsqueda imprimible (A4 a 150 dpi), dibujado en canvas.
 // El flyer es GRATIS para toda mascota perdida (es herramienta de rescate);
@@ -68,14 +69,39 @@ function wrapText(ctx, text, maxWidth) {
   return lines;
 }
 
-function loadImage(src) {
+function loadImageElement(src, crossOrigin = false) {
   return new Promise((resolve) => {
     const img = new Image();
-    img.crossOrigin = 'anonymous'; // fotos de Firebase Storage
+    if (crossOrigin) img.crossOrigin = 'anonymous';
     img.onload = () => resolve(img);
     img.onerror = () => resolve(null);
     img.src = src;
   });
+}
+
+async function loadImage(src) {
+  if (!src) return null;
+
+  // Android WebView puede mostrar una URL de Firebase en <img>, pero bloquear
+  // esa misma imagen al usarla en canvas por CORS. En nativo la descargamos con
+  // la capa HTTP de Capacitor y la convertimos a data URL antes de dibujarla.
+  if (Capacitor.isNativePlatform() && /^https?:/i.test(src)) {
+    try {
+      const response = await CapacitorHttp.get({ url: src, responseType: 'blob' });
+      if (response.status >= 200 && response.status < 300 && typeof response.data === 'string') {
+        const contentTypeEntry = Object.entries(response.headers ?? {}).find(
+          ([key]) => key.toLowerCase() === 'content-type',
+        );
+        const contentType = String(contentTypeEntry?.[1] ?? 'image/jpeg').split(';')[0];
+        const nativeImage = await loadImageElement(`data:${contentType};base64,${response.data}`);
+        if (nativeImage) return nativeImage;
+      }
+    } catch (err) {
+      console.warn('No se pudo descargar la foto para el flyer:', err);
+    }
+  }
+
+  return loadImageElement(src, /^https?:/i.test(src));
 }
 
 function withShadow(ctx, draw) {

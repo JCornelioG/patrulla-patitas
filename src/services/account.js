@@ -47,7 +47,9 @@ async function nativeCredential(name) {
   const { FirebaseAuthentication } = await import('@capacitor-firebase/authentication');
   if (name === 'google') {
     const result = await FirebaseAuthentication.signInWithGoogle({ skipNativeAuth: true });
-    return GoogleAuthProvider.credential(result.credential?.idToken);
+    const idToken = result.credential?.idToken;
+    if (!idToken) throw Object.assign(new Error('Google no devolvió un token de identidad.'), { code: 'auth/missing-id-token' });
+    return GoogleAuthProvider.credential(idToken);
   }
   const result = await FirebaseAuthentication.signInWithApple({ skipNativeAuth: true });
   return new OAuthProvider('apple.com').credential({
@@ -90,6 +92,21 @@ export async function linkOrSignIn(name) {
       return {
         status: 'error',
         message: 'Este método aún no está habilitado. Actívalo en la consola de Firebase.',
+      };
+    }
+    // Android devuelve normalmente el código 10 (DEVELOPER_ERROR) cuando el
+    // paquete/huella SHA del AAB no tiene un cliente OAuth en Firebase.
+    const nativeMessage = String(err?.message ?? '');
+    if (
+      name === 'google' &&
+      (err?.code === '10' ||
+        err?.code === 10 ||
+        err?.code === 'auth/missing-id-token' ||
+        /developer[_ ]?error|status(?:code)?[: ]+10/i.test(nativeMessage))
+    ) {
+      return {
+        status: 'error',
+        message: 'Google aún no está configurado para esta versión. Falta registrar la huella SHA de la app en Firebase.',
       };
     }
     if (err?.code === 'auth/popup-blocked') {

@@ -129,6 +129,9 @@ se hacen en la nube con Codemagic (no requieren Mac).
 - Vinculación de cuenta Google/Apple, onboarding, haptics.
 - Repo en GitHub, web desplegada, Codemagic compilando AAB firmado.
 - Cuenta de Play pagada; ficha (gráficos en `store/` + textos en `PLAYSTORE.md`) lista.
+- Android Google Sign-In configurado con la huella SHA-1 de la clave de firma
+  de Google Play; `google-services.json` ya contiene los clientes OAuth Android
+  y web. Falta comprobarlo en el próximo AAB de prueba interna.
 
 **Pendiente ⏳ (solo trámites del dueño)**
 1. Verificación de identidad de Google Play (~2 días).
@@ -138,8 +141,6 @@ se hacen en la nube con Codemagic (no requieren Mac).
    entitlement `plus`, pegar keys `appl_`/`goog_` en `src/config/revenuecat.js`.
 4. iOS: cuenta Apple Developer + clave APNs (subir a Firebase) → build en Codemagic
    → TestFlight → revisión.
-5. Android Google Sign-In: agregar huellas SHA-1/SHA-256 del keystore a Firebase y
-   re-descargar `google-services.json`.
 
 ---
 

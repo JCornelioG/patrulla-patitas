@@ -1083,7 +1083,10 @@ main {
 .detail {
   position: absolute;
   inset: 0;
-  z-index: 60;
+  /* Debe quedar por encima de las tarjetas flotantes del mapa principal
+     (.map-card usa 1200). Si no, esa tarjeta atraviesa el detalle y también
+     tapa los campos de sus modales, especialmente al abrir el teclado. */
+  z-index: 1500;
   background: var(--color-background);
   display: flex;
   flex-direction: column;

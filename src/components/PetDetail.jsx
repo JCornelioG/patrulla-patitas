@@ -13,6 +13,7 @@ export default function PetDetail({
   pet,
   now,
   userLocation,
+  userAccuracy,
   isPlus,
   initialPlacing = false,
   onClose,
@@ -117,6 +118,7 @@ export default function PetDetail({
               focus={pet}
               now={now}
               userLocation={userLocation}
+              userAccuracy={userAccuracy}
               placing={placing}
               onPlace={(latlng) => setPending(latlng)}
               height={300}

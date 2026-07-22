@@ -45,7 +45,7 @@ export default function App() {
       return false;
     }
   });
-  const { location: userLocation } = useUserLocation();
+  const { location: userLocation, accuracy: userAccuracy } = useUserLocation();
   const isPlus = usePlus();
 
   function finishOnboarding() {
@@ -235,6 +235,7 @@ export default function App() {
             pets={lostPets}
             now={now}
             userLocation={userLocation}
+            userAccuracy={userAccuracy}
             onOpen={openDetail}
             onReportSighting={(id) => openDetail(id, { placing: true })}
           />
@@ -261,6 +262,7 @@ export default function App() {
           pet={selected}
           now={now}
           userLocation={userLocation}
+          userAccuracy={userAccuracy}
           isPlus={isPlus}
           initialPlacing={autoPlace}
           onClose={() => {

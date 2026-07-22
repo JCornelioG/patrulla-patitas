@@ -8,18 +8,23 @@ import { DEFAULT_LOCATION } from '../config/constants';
 export function useUserLocation() {
   const [location, setLocation] = useState(DEFAULT_LOCATION);
   const [isReal, setIsReal] = useState(false);
+  const [accuracy, setAccuracy] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
         const pos = await Geolocation.getCurrentPosition({
-          enableHighAccuracy: false,
-          timeout: 8000,
-          maximumAge: 60000,
+          // El punto azul es privado y sí debe usar la mejor precisión del
+          // dispositivo. El redondeo a ~100 m se aplica recién al PUBLICAR
+          // una alerta o avistamiento (App.jsx), no al ubicar al usuario.
+          enableHighAccuracy: true,
+          timeout: 20000,
+          maximumAge: 0,
         });
         if (!cancelled) {
           setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+          setAccuracy(Number.isFinite(pos.coords.accuracy) ? pos.coords.accuracy : null);
           setIsReal(true);
         }
       } catch {
@@ -31,5 +36,5 @@ export function useUserLocation() {
     };
   }, []);
 
-  return { location, isReal };
+  return { location, isReal, accuracy };
 }

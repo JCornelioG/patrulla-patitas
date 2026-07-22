@@ -1,6 +1,6 @@
-import { Fragment } from 'react';
+import { Fragment, useEffect } from 'react';
 import L from 'leaflet';
-import { MapContainer, TileLayer, Circle, Polyline, Marker, Popup, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Circle, Polyline, Marker, Popup, useMap, useMapEvents } from 'react-leaflet';
 import { alertRadius, formatClock } from '../utils/geo';
 
 // SVG inline para los marcadores (Leaflet renderiza HTML plano).
@@ -46,6 +46,17 @@ function ClickCapture({ onPlace }) {
   return null;
 }
 
+// MapContainer solo usa `center` al montarse. El GPS llega de forma asíncrona,
+// así que centramos una vez más cuando recibimos la lectura real; sin esto el
+// marcador se actualizaba pero el mapa podía seguir mostrando la zona anterior.
+function SyncUserLocation({ location, disabled }) {
+  const map = useMap();
+  useEffect(() => {
+    if (!disabled) map.setView([location.lat, location.lng], map.getZoom(), { animate: false });
+  }, [disabled, location.lat, location.lng, map]);
+  return null;
+}
+
 // Mapa reutilizable: por cada mascota perdida dibuja su zona aproximada
 // (baja opacidad), el radio de alerta en expansión y el rastro cronológico.
 // El zoom nativo de Leaflet se oculta; los controles los pone el contenedor.
@@ -54,6 +65,7 @@ export default function AlertMap({
   focus = null,
   now,
   userLocation,
+  userAccuracy = null,
   placing = false,
   onPlace,
   onPetClick,
@@ -79,9 +91,27 @@ export default function AlertMap({
         />
 
         {placing && onPlace && <ClickCapture onPlace={onPlace} />}
+        <SyncUserLocation location={userLocation} disabled={Boolean(focus)} />
+
+        {userAccuracy && userAccuracy > 0 && (
+          <Circle
+            center={[userLocation.lat, userLocation.lng]}
+            radius={userAccuracy}
+            interactive={false}
+            pathOptions={{
+              color: '#1976D2',
+              weight: 1,
+              fillColor: '#1976D2',
+              fillOpacity: 0.08,
+            }}
+          />
+        )}
 
         <Marker position={[userLocation.lat, userLocation.lng]} icon={userIcon}>
-          <Popup>Estás por aquí</Popup>
+          <Popup>
+            Estás por aquí
+            {userAccuracy ? ` (precisión aproximada: ${Math.round(userAccuracy)} m)` : ''}
+          </Popup>
         </Marker>
 
         {pets

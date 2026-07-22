@@ -9,7 +9,7 @@ import { distanceM, formatDistance, formatElapsed } from '../utils/geo';
 //   - "Alertas":   mascotas perdidas (rescate).
 //   - "Servicios": veterinarias, albergues, etc. desde OpenStreetMap.
 // Un toggle superior cambia entre ambas sin recargar la navegación inferior.
-export default function MapTab({ pets, now, userLocation, onOpen, onReportSighting }) {
+export default function MapTab({ pets, now, userLocation, userAccuracy, onOpen, onReportSighting }) {
   const [view, setView] = useState('alertas');
   const mapRef = useRef(null);
   const [selectedId, setSelectedId] = useState(null);
@@ -66,7 +66,14 @@ export default function MapTab({ pets, now, userLocation, onOpen, onReportSighti
             ))}
           </div>
 
-          <AlertMap pets={pets} now={now} userLocation={userLocation} onPetClick={select} mapRef={mapRef} />
+          <AlertMap
+            pets={pets}
+            now={now}
+            userLocation={userLocation}
+            userAccuracy={userAccuracy}
+            onPetClick={select}
+            mapRef={mapRef}
+          />
 
           <div className="map-fabs">
             <button className="fab-mini" aria-label="Acercar" onClick={() => mapRef.current?.zoomIn()}>
