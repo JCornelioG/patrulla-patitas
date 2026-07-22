@@ -4,6 +4,7 @@
 // dispositivo y localizar también la ficha del App Store por país.
 // Los precios NO necesitan i18n: StoreKit/RevenueCat ya los localizan.
 import { useEffect, useState } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { createStore } from './services';
 import { initPush } from './services/push';
 import { getProfile } from './services/profile';
@@ -83,6 +84,22 @@ export default function App() {
   // Estado de la suscripción Patitas Plus (RevenueCat o modo prueba).
   useEffect(() => {
     initSubscription();
+  }, []);
+
+  // Barra de estado (solo app nativa): transparente + iconos oscuros, para
+  // que el fondo crema del header se vea detrás y todo combine. En web no hace
+  // nada. Style.Light = texto/iconos oscuros sobre fondo claro.
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+    (async () => {
+      try {
+        const { StatusBar, Style } = await import('@capacitor/status-bar');
+        await StatusBar.setOverlaysWebView({ overlays: true });
+        await StatusBar.setStyle({ style: Style.Light });
+      } catch (err) {
+        console.warn('StatusBar no disponible:', err);
+      }
+    })();
   }, []);
 
   // Reloj global: cronómetros y radio de alerta en expansión.
